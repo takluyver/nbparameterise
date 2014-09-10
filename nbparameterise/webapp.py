@@ -35,8 +35,6 @@ def make_application(filename):
                 names_values.append((name, value))
             
             replace_definitions(nb, names_values)
-            print(names_values)
-            print(nb.worksheets[0].cells[0].input)
             html = execute_and_render(nb)
             self.write(html)
     
