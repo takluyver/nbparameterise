@@ -1,11 +1,9 @@
 import ast
-import sys
 
 import astcheck
 import astsearch
 from IPython.nbconvert.exporters.html import HTMLExporter
 from IPython.nbconvert.preprocessors.execute import ExecutePreprocessor
-from IPython.nbformat import current as nbformat
 
 def check_fillable_node(node, path):
     if isinstance(node, (ast.Num, ast.Str)):
