@@ -1,6 +1,6 @@
 Choose input values for a notebook, and nbparameterise will run it and render to HTML
 
-*Experimental, alpha level code*
+*Experimental code*
 
 To use it, create a notebook, where the first code cell contains simple variable
 assignments of strings, numbers and booleans. Other cells after this should
