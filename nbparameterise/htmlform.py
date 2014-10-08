@@ -3,11 +3,22 @@ import htmlgen
 class Input(htmlgen.Element):
     type = htmlgen.html_attribute('type', default='text')
     name = htmlgen.html_attribute('name')
-    def __init__(self, type, name=None):
+    value = htmlgen.html_attribute('value')
+
+    def __init__(self, type, name=None, value=None):
         super().__init__("input")
         self.type = type
         if name is not None:
             self.name = name
+        if value is not None:
+            self.value = value
+
+class Checkbox(Input):
+    checked = htmlgen.boolean_html_attribute('checked')
+
+    def __init__(self, name=None, checked=False):
+        super().__init__(type="checkbox", name=name)
+        self.checked=checked
 
 class WrapperDiv(htmlgen.Division):
     def __init__(self, *children, css_classes=None, id=None):
@@ -22,8 +33,18 @@ py_type_to_html_input_type = {
     str: 'text',
     int: 'number',
     float: 'number',
-    bool: 'checkbox',
 }
+
+def make_input_element(var):
+    if var.type is bool:
+        input_elm = Checkbox(var.name, var.value)
+    else:
+        input_elm = Input(py_type_to_html_input_type[var.type], var.name,
+                          str(var.value))
+        if var.type is float:
+            input_elm.set_attribute('step', 'any')
+    
+    return input_elm
 
 def build_form(definitions, nbname):
     doc = htmlgen.Document(title="{} (input)".format(nbname))
@@ -48,11 +69,7 @@ def build_form(definitions, nbname):
         def generate_children(self):
             for v in definitions:
                 namediv = WrapperDiv(v.name, css_classes=['field-name'])
-                
-                input_elm = Input(py_type_to_html_input_type[v.type], v.name)
-                if v.type is float:
-                    input_elm.set_attribute('step', 'any')
-
+                input_elm = make_input_element(v)
                 yield WrapperDiv(namediv, input_elm, css_classes=['form-field'])
             
             submit = Input('submit')
