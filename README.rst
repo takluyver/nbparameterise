@@ -13,5 +13,4 @@ At the command line::
 
 
 Nbparameterise is written in Python 3, but it can handle running notebooks in
-Python 2, once `an IPython bug <https://github.com/ipython/ipython/issues/6447>`_
-is fixed.
+Python 2, so long as they were saved by a recent enough version of IPython.
