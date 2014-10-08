@@ -46,11 +46,11 @@ def build_form(definitions, nbname):
             self.set_attribute('method', 'post')
         
         def generate_children(self):
-            for name, valuetype in definitions:                
-                namediv = WrapperDiv(name, css_classes=['field-name'])
+            for v in definitions:
+                namediv = WrapperDiv(v.name, css_classes=['field-name'])
                 
-                input_elm = Input(py_type_to_html_input_type[valuetype], name)
-                if valuetype is float:
+                input_elm = Input(py_type_to_html_input_type[v.type], v.name)
+                if v.type is float:
                     input_elm.set_attribute('step', 'any')
 
                 yield WrapperDiv(namediv, input_elm, css_classes=['form-field'])

@@ -19,15 +19,15 @@ class MainHandler(tornado.web.RequestHandler):
 
 class SubmissionHandler(tornado.web.RequestHandler):
     def post(self):
-        names_values = []
-        for name, valtype in self.application.definitions:
-            if valtype is bool:
-                value = (self.get_argument(name, default='off') == 'on')
+        defined = []
+        for v in self.application.definitions:
+            if v.type is bool:
+                inp = v.with_value(self.get_argument(v.name, default='off') == 'on')
             else:
-                value = valtype(self.get_argument(name))
-            names_values.append((name, value))
+                inp = v.with_value(v.type(self.get_argument(v.name)))
+            defined.append(inp)
         
-        replace_definitions(self.application.nb, names_values)
+        replace_definitions(self.application.nb, defined)
         html = execute_and_render(self.application.nb)
         self.write(html)
 
