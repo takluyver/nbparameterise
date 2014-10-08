@@ -10,6 +10,12 @@ class Input(object):
         self.type = vtype
         self.value = value
 
+    def __repr__(self):
+        params = [repr(self.name), self.type.__name__]
+        if self.value is not None:
+            params.append("value=%r" % self.value)
+        return "Input(%s)" % ", ".join(params)
+
     def with_value(self, value):
         """Returns a copy with value set to a new value."""
         return type(self)(self.name, self.type, value)
@@ -28,7 +34,7 @@ def get_driver_module(nb):
 
 def extract_cell1_definitions(nb):
     drv = get_driver_module(nb)
-    return drv.extract_definitions(first_code_cell(nb).input)
+    return list(drv.extract_definitions(first_code_cell(nb).input))
 
 def replace_definitions(nb, values):
     drv = get_driver_module(nb)
