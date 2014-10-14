@@ -12,7 +12,7 @@ stock_names = ['YHOO', 'MSFT', 'GOOG']
 with open("Stock display.ipynb") as f:
     nb = nbformat.read(f, 'ipynb')
 
-definitions = code.extract_cell1_definitions(nb)
+definitions = code.extract_parameters(nb)
 
 for name in stock_names:
     print("Rendering for stock", name)

@@ -46,7 +46,7 @@ def make_input_element(var):
     
     return input_elm
 
-def build_form(definitions, nbname):
+def build_form(parameters, nbname):
     doc = htmlgen.Document(title="{} (input)".format(nbname))
     doc.add_stylesheets("https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css",
                         "https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css",
@@ -67,8 +67,9 @@ def build_form(definitions, nbname):
             self.set_attribute('method', 'post')
         
         def generate_children(self):
-            for v in definitions:
-                namediv = WrapperDiv(v.name, css_classes=['field-name'])
+            for v in parameters:
+                name = v.metadata.get('display_name', v.name)
+                namediv = WrapperDiv(name, css_classes=['field-name'])
                 input_elm = make_input_element(v)
                 yield WrapperDiv(namediv, input_elm, css_classes=['form-field'])
             

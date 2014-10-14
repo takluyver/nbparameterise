@@ -3,7 +3,7 @@ import ast
 import astcheck
 import astsearch
 
-from ..code import Input
+from ..code import Parameter
 
 __all__ = ['extract_definitions', 'build_definitions']
 
@@ -28,7 +28,7 @@ def type_and_value(node):
 def extract_definitions(cell):
     cell_ast = ast.parse(cell)
     for assign in astsearch.ASTPatternFinder(definition_pattern).scan_ast(cell_ast):
-        yield Input(assign.targets[0].id, *type_and_value(assign.value))
+        yield Parameter(assign.targets[0].id, *type_and_value(assign.value))
 
 def build_definitions(inputs):
     return "\n".join("{0.name} = {0.value!r}".format(i) for i in inputs)

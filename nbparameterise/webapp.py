@@ -6,7 +6,7 @@ from IPython.nbformat import current as nbformat
 import tornado.ioloop
 import tornado.web
 
-from .code import extract_cell1_definitions, replace_definitions, execute_and_render
+from .code import extract_parameters, replace_definitions, execute_and_render
 from .htmlform import build_form
 
 static_path = os.path.join(os.path.dirname(__file__), 'static')
@@ -14,13 +14,13 @@ static_path = os.path.join(os.path.dirname(__file__), 'static')
 
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
-        self.write(str(build_form(self.application.definitions, 
+        self.write(str(build_form(self.application.parameters,
                                   self.application.nbname)))
 
 class SubmissionHandler(tornado.web.RequestHandler):
     def post(self):
         defined = []
-        for v in self.application.definitions:
+        for v in self.application.parameters:
             if v.type is bool:
                 inp = v.with_value(self.get_argument(v.name, default='off') == 'on')
             else:
@@ -41,7 +41,7 @@ class NbparameteriseApplication(tornado.web.Application):
         basename = os.path.basename(path)
         assert basename.endswith('.ipynb')
         self.nbname = basename[:-6]
-        self.definitions = list(extract_cell1_definitions(self.nb))
+        self.parameters = extract_parameters(self.nb)
         super().__init__([
             (r"/", MainHandler),
             (r"/submit", SubmissionHandler)
@@ -51,6 +51,7 @@ class NbparameteriseApplication(tornado.web.Application):
 def main():
     application = NbparameteriseApplication(sys.argv[1])
     application.listen(8888)
+    print("Visit http://localhost:8888/")
     tornado.ioloop.IOLoop.instance().start()
 
 if __name__ == "__main__":
