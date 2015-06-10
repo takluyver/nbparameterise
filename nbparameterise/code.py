@@ -22,7 +22,7 @@ class Parameter(object):
         return type(self)(self.name, self.type, value, self.metadata or None)
 
 def first_code_cell(nb):
-    for cell in nb.worksheets[0].cells:
+    for cell in nb.cells:
         if cell.cell_type == 'code':
             return cell
 
@@ -35,7 +35,7 @@ def get_driver_module(nb):
 
 def extract_parameters(nb):
     drv = get_driver_module(nb)
-    params = list(drv.extract_definitions(first_code_cell(nb).input))
+    params = list(drv.extract_definitions(first_code_cell(nb).source))
 
     # Add extra info from notebook metadata
     for param in params:
@@ -45,7 +45,7 @@ def extract_parameters(nb):
 
 def replace_definitions(nb, values):
     drv = get_driver_module(nb)
-    first_code_cell(nb).input = drv.build_definitions(values)
+    first_code_cell(nb).source = drv.build_definitions(values)
 
 def execute_and_render(nb):
     resources = {}

@@ -2,7 +2,7 @@ import os.path
 import sys
 
 
-from IPython.nbformat import current as nbformat
+import IPython.nbformat as nbformat
 import tornado.ioloop
 import tornado.web
 
@@ -36,7 +36,7 @@ class NbparameteriseApplication(tornado.web.Application):
     def __init__(self, path):
         self.path = path
         with open(path) as f:
-            self.nb = nbformat.read(f, 'ipynb')
+            self.nb = nbformat.read(f, as_version=4)
         
         basename = os.path.basename(path)
         assert basename.endswith('.ipynb')
