@@ -2,15 +2,15 @@
 """
 
 from nbparameterise import code
-from IPython.nbformat import current as nbformat
-from IPython.nbconvert.preprocessors.execute import ExecutePreprocessor
-from IPython.nbconvert.exporters.notebook import NotebookExporter
-from IPython.nbconvert.writers import FilesWriter
+import nbformat
+from nbconvert.preprocessors.execute import ExecutePreprocessor
+from nbconvert.exporters.notebook import NotebookExporter
+from nbconvert.writers import FilesWriter
 
 stock_names = ['YHOO', 'MSFT', 'GOOG']
 
 with open("Stock display.ipynb") as f:
-    nb = nbformat.read(f, 'ipynb')
+    nb = nbformat.read(f, as_version=4)
 
 definitions = code.extract_parameters(nb)
 
