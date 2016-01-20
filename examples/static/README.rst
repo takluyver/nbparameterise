@@ -4,6 +4,8 @@ Examples of using nbparameterise:
 to choose input values. When the user clicks 'Run notebook', it renders an HTML
 view of the notebook run with their inputs. Run it with::
 
+    # Get the dependencies
+    pip install tornado htmlgen
     python3 webapp.py "Stock display.ipynb"
 
 **batch** demonstrates running in batch mode, looping over parameter values.
