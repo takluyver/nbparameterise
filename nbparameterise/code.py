@@ -1,8 +1,8 @@
 import importlib
 import re
 
-from IPython.nbconvert.exporters.html import HTMLExporter
-from IPython.nbconvert.preprocessors.execute import ExecutePreprocessor
+from nbconvert.exporters.html import HTMLExporter
+from nbconvert.preprocessors.execute import ExecutePreprocessor
 
 class Parameter(object):
     def __init__(self, name, vtype, value=None, metadata=None):

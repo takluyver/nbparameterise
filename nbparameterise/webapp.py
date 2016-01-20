@@ -1,8 +1,7 @@
 import os.path
 import sys
 
-
-import IPython.nbformat as nbformat
+import nbformat as nbformat
 import tornado.ioloop
 import tornado.web
 
