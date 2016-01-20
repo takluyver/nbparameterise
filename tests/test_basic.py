@@ -1,7 +1,7 @@
 import os.path
 import unittest
 
-from IPython.nbformat import current as nbformat
+import nbformat
 from nbparameterise import code
 
 samplenb = os.path.join(os.path.dirname(__file__), 'sample.ipynb')
@@ -9,7 +9,7 @@ samplenb = os.path.join(os.path.dirname(__file__), 'sample.ipynb')
 class BasicTestCase(unittest.TestCase):
     def setUp(self):
         with open(samplenb) as f:
-            self.nb = nbformat.read(f, 'ipynb')
+            self.nb = nbformat.read(f, as_version=4)
 
         self.params = code.extract_parameters(self.nb)
 
@@ -42,10 +42,10 @@ class BasicTestCase(unittest.TestCase):
             self.params[2].with_value(0.25),
             self.params[3].with_value(True),
         ]
-        code.replace_definitions(self.nb, from_form)
+        nb = code.replace_definitions(self.nb, from_form, execute=False)
 
         ns = {}
-        exec(self.nb.worksheets[0].cells[0].input, ns)
+        exec(nb.cells[0].source, ns)
         assert ns['a'] == "New text"
         assert ns['b'] == 21
         assert ns['c'] == 0.25
