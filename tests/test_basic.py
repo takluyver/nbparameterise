@@ -50,3 +50,17 @@ class BasicTestCase(unittest.TestCase):
         assert ns['b'] == 21
         assert ns['c'] == 0.25
         assert ns['d'] == True
+
+    def test_new_values(self):
+        params = code.parameter_values(self.params,
+            a = "New text",
+            c = 12.0
+        )
+
+        assert [p.name for p in params] == ['a', 'b', 'c', 'd']
+
+        assert params[0].value == 'New text'
+        assert params[1].value == 12
+        assert params[2].value == 12.0
+        assert isinstance(params[2].value, float)
+        assert params[3].value == False
