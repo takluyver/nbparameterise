@@ -4,8 +4,6 @@
 
 from nbparameterise import extract_parameters, parameter_values, replace_definitions
 import nbformat
-from nbconvert.exporters.notebook import NotebookExporter
-from nbconvert.writers import FilesWriter
 
 stock_names = ['YHOO', 'MSFT', 'GOOG']
 
@@ -17,11 +15,10 @@ orig_parameters = extract_parameters(nb)
 for name in stock_names:
     print("Running for stock", name)
 
+    # Update the parameters and run the notebook
     params = parameter_values(orig_parameters, stock=name)
-    
-    nb = replace_definitions(nb, params)
+    new_nb = replace_definitions(nb, params)
 
     # Save
-    output, resources = NotebookExporter().from_notebook_node(nb, {})
-    nbname = "Stock display %s" % name
-    FilesWriter().write(output, resources, notebook_name=nbname)
+    with open("Stock display %s.ipynb" % name, 'w') as f:
+        nbformat.write(new_nb, f)
