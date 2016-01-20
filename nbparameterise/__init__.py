@@ -2,4 +2,6 @@
 
 __version__ = '0.1'
 
-from .code import Parameter, extract_parameters, replace_definitions
+from .code import (Parameter, extract_parameters, replace_definitions,
+                    parameter_values,
+                  )

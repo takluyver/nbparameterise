@@ -55,6 +55,26 @@ def extract_parameters(nb, lang=None):
 
     return params
 
+def parameter_values(params, **kwargs):
+    """Return a copy of the parameter list, substituting values from kwargs.
+
+    Usage example::
+
+        params = parameter_values(params,
+            stock='GOOG',
+            days_back=300
+        )
+
+    Any parameters not supplied will keep their original value.
+    """
+    res = []
+    for p in params:
+        if p.name in kwargs:
+            res.append(p.with_value(kwargs[p.name]))
+        else:
+            res.append(p)
+    return res
+
 def replace_definitions(nb, values, execute=True, execute_resources=None,
                         lang=None):
     """Return a copy of nb with the first code cell defining the given parameters.
