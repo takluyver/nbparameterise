@@ -1,12 +1,14 @@
 import os.path
 import sys
 
-import nbformat as nbformat
+import nbformat
+from nbconvert.preprocessors import ExecutePreprocessor
+from nbconvert.exporters import HTMLExporter
 import tornado.ioloop
 import tornado.web
 
-from .code import extract_parameters, replace_definitions, execute_and_render
-from .htmlform import build_form
+from nbparameterise import extract_parameters, replace_definitions
+from htmlform import build_form
 
 static_path = os.path.join(os.path.dirname(__file__), 'static')
 
@@ -25,10 +27,11 @@ class SubmissionHandler(tornado.web.RequestHandler):
             else:
                 inp = v.with_value(v.type(self.get_argument(v.name)))
             defined.append(inp)
-        
-        replace_definitions(self.application.nb, defined)
-        html = execute_and_render(self.application.nb)
-        self.write(html)
+
+        res = {'path': os.path.dirname(self.application.path)}
+        nb = replace_definitions(self.application.nb, defined, execute_resources=res)
+        output, _ = HTMLExporter().from_notebook_node(nb, res)
+        self.write(output)
 
 
 class NbparameteriseApplication(tornado.web.Application):

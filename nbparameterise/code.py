@@ -1,8 +1,8 @@
+import copy
 import importlib
 import re
 
-from nbconvert.exporters.html import HTMLExporter
-from nbconvert.preprocessors.execute import ExecutePreprocessor
+from nbconvert.preprocessors import ExecutePreprocessor
 
 class Parameter(object):
     def __init__(self, name, vtype, value=None, metadata=None):
@@ -28,12 +28,24 @@ def first_code_cell(nb):
 
 kernel_name_re = re.compile(r'\w+$')
 
-def get_driver_module(nb):
-    kernel_name = nb.metadata.get('kernelspec', {}).get('name', 'python3')
-    assert kernel_name_re.match(kernel_name)
-    return importlib.import_module('nbparameterise.code_drivers.%s' % kernel_name)
+def get_driver_module(nb, override=None):
+    if override:
+        module_name = override
+    else:
+        module_name = nb.metadata.get('kernelspec', {}).get('name', 'python3')
+    assert kernel_name_re.match(module_name)
+    return importlib.import_module('nbparameterise.code_drivers.%s' % module_name)
 
-def extract_parameters(nb):
+def extract_parameters(nb, lang=None):
+    """Returns a list of Parameter instances derived from the notebook.
+
+    This looks for assignments (like 'n = 50') in the first code cell of the
+    notebook. The parameters may also have some metadata stored in the notebook
+    metadata; this will be attached as the .metadata instance on each one.
+
+    lang may be used to override the kernel name embedded in the notebook. For
+    now, nbparameterise only handles 'python3' and 'python2'.
+    """
     drv = get_driver_module(nb)
     params = list(drv.extract_definitions(first_code_cell(nb).source))
 
@@ -43,12 +55,25 @@ def extract_parameters(nb):
 
     return params
 
-def replace_definitions(nb, values):
-    drv = get_driver_module(nb)
-    first_code_cell(nb).source = drv.build_definitions(values)
+def replace_definitions(nb, values, execute=True, execute_resources=None,
+                        lang=None):
+    """Return a copy of nb with the first code cell defining the given parameters.
 
-def execute_and_render(nb):
-    resources = {}
-    nb, resources = ExecutePreprocessor().preprocess(nb, resources)
-    output, resources = HTMLExporter().from_notebook_node(nb, resources)
-    return output
+    values should be a list of Parameter objects (as returned by extract_parameters),
+    with their .value attribute set to the desired value.
+
+    If execute is True, the notebook is executed with the new values.
+    execute_resources is passed to nbconvert.ExecutePreprocessor; it's a dict,
+    and if possible should contain a 'path' key for the working directory in
+    which to run the notebook.
+
+    lang may be used to override the kernel name embedded in the notebook. For
+    now, nbparameterise only handles 'python3' and 'python2'.
+    """
+    nb = copy.deepcopy(nb)
+    drv = get_driver_module(nb, override=lang)
+    first_code_cell(nb).source = drv.build_definitions(values)
+    if execute:
+        resources = execute_resources or {}
+        nb, resources = ExecutePreprocessor().preprocess(nb, resources)
+    return nb
