@@ -52,8 +52,8 @@ class NbparameteriseApplication(tornado.web.Application):
 
 def main():
     application = NbparameteriseApplication(sys.argv[1])
-    application.listen(8888)
-    print("Visit http://localhost:8888/")
+    application.listen(3131)
+    print("Visit http://localhost:3131/")
     tornado.ioloop.IOLoop.instance().start()
 
 if __name__ == "__main__":
