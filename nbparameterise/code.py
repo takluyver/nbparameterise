@@ -46,7 +46,7 @@ def extract_parameters(nb, lang=None):
     lang may be used to override the kernel name embedded in the notebook. For
     now, nbparameterise only handles 'python3' and 'python2'.
     """
-    drv = get_driver_module(nb)
+    drv = get_driver_module(nb, override=lang)
     params = list(drv.extract_definitions(first_code_cell(nb).source))
 
     # Add extra info from notebook metadata
