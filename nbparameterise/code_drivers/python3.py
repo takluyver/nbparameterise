@@ -12,8 +12,10 @@ def check_fillable_node(node, path):
         return
     elif isinstance(node, ast.NameConstant) and (node.value in (True, False)):
         return
+    elif isinstance(node, ast.List):
+        return
     
-    raise astcheck.ASTMismatch(path, node, 'number, string or boolean')
+    raise astcheck.ASTMismatch(path, node, 'number, string, boolean or list of str,num or boolean')
 
 definition_pattern = ast.Assign(targets=[ast.Name()], value=check_fillable_node)
 
@@ -23,6 +25,12 @@ def type_and_value(node):
         return type(node.n), node.n
     elif isinstance(node, ast.Str):
         return str, node.s
+    elif isinstance(node, ast.List):
+        values = []
+        for child in node.elts:
+            _, val = type_and_value(child)
+            values.append(val)
+        return list, values
     return (bool, node.value)
 
 def extract_definitions(cell):

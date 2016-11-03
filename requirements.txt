@@ -1,0 +1,7 @@
+# for python3
+jupyter
+jupyter-clients
+astcheck
+astsearch
+nbconvert
+ipykernel

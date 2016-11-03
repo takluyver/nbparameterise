@@ -7,7 +7,7 @@ assignments of strings, numbers and booleans. Other cells after this should
 do computation based on these values, and display the results. See 'Stock display'
 for an example.
 
-See the ``examples`` directory for some code using nbparameterise.
+See the  ``batch.py`` and the ``examples`` directory for some code using nbparameterise.
 
 Nbparameterise is written in Python 3, but it can handle notebooks that use
 Python 2.
