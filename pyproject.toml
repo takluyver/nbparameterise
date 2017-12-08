@@ -10,5 +10,5 @@ home-page = "https://github.com/takluyver/nbparameterise"
 classifiers = ["License :: OSI Approved :: MIT License"]
 description-file = "README.rst"
 requires = ["nbconvert", "astsearch"]
-requires-python = "3"
+requires-python = ">=3.4"
 
