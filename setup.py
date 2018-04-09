@@ -7,8 +7,10 @@ setup(name='nbparameterise',
       author='takluyver with modifications by mt-krainski',
       author_email='mateusz@krainski.eu',
       license='MIT',
-      packages=['nbparameterise'],
+      packages=['nbparameterise', 'nbparameterise.code_drivers'],
       install_requires=[
           'jupyter',
+          'astcheck',
+          'astsearch',
       ],
       zip_safe=False)

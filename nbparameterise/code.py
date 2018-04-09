@@ -1,6 +1,8 @@
 import copy
 import importlib
 import re
+import os
+import sys
 
 from nbconvert.preprocessors import ExecutePreprocessor
 
@@ -33,8 +35,22 @@ def get_driver_module(nb, override=None):
         module_name = override
     else:
         module_name = nb.metadata.get('kernelspec', {}).get('name', 'python3')
+
+    valid_module_names = \
+        [x for x in
+            os.listdir(
+                os.path.join(
+                    os.path.dirname(__file__), 'code_drivers'))
+         if x!='__init__.py' and x!='__pycache__']
+
+    if module_name not in valid_module_names:
+        if sys.version_info[0] < 3:
+            module_name = 'python2'
+        else:
+            module_name = 'python3'
+
     assert kernel_name_re.match(module_name)
-    return importlib.import_module('nbparameterise.code_drivers.%s' % module_name)
+    return importlib.import_module('.code_drivers.%s' % module_name, 'nbparameterise')
 
 def extract_parameters(nb, lang=None):
     """Returns a list of Parameter instances derived from the notebook.
