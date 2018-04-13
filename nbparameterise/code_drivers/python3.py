@@ -8,7 +8,7 @@ from ..code import Parameter
 __all__ = ['extract_definitions', 'build_definitions']
 
 def check_fillable_node(node, path):
-    if isinstance(node, (ast.Num, ast.Str)):
+    if isinstance(node, (ast.Num, ast.Str, ast.List)):
         return
     elif isinstance(node, ast.NameConstant) and (node.value in (True, False)):
         return
@@ -23,6 +23,8 @@ def type_and_value(node):
         return type(node.n), node.n
     elif isinstance(node, ast.Str):
         return str, node.s
+    elif isisntance(node, ast.List):
+        return list, node.s
     return (bool, node.value)
 
 def extract_definitions(cell):
