@@ -1,9 +1,17 @@
 #!/usr/bin/env python3
+"""Present an HTML form for the parameters of a notebook, and run it on submission.
+
+To use this example, run::
+
+    python3 webapp.py "Stock display.ipynb"
+
+The form fields are not hardcoded here; they are built from the notebook, so it
+should build a suitable form for any notebook you run this with.
+"""
 import os.path
 import sys
 
 import nbformat
-from nbconvert.preprocessors import ExecutePreprocessor
 from nbconvert.exporters import HTMLExporter
 import tornado.ioloop
 import tornado.web

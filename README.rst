@@ -40,6 +40,5 @@ Usage:
     # Update one or more parameters
     params = parameter_values(orig_parameters, stock='GOOG')
 
-    # Make a notebook object with these definitions;
-    # you can then save or execute this.
+    # Make a notebook object with these definitions, and execute it.
     new_nb = replace_definitions(nb, params)
