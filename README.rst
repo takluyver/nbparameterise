@@ -27,7 +27,9 @@ Usage:
 .. code-block:: python
 
     import nbformat
-    from nbparameterise import extract_parameters, replace_definitions
+    from nbparameterise import (
+        extract_parameters, replace_definitions, parameter_values
+    )
 
     with open("Stock display.ipynb") as f:
         nb = nbformat.read(f, as_version=4)
