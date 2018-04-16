@@ -1,0 +1,16 @@
+[build-system]
+requires = ["flit"]
+build-backend = "flit.buildapi"
+
+[tool.flit.metadata]
+module = "nbparameterise"
+author = "Thomas Kluyver"
+author-email = "thomas@kluyver.me.uk"
+home-page = "https://github.com/takluyver/nbparameterise"
+classifiers = ["License :: OSI Approved :: MIT License",
+    "Framework :: Jupyter",
+]
+description-file = "README.rst"
+requires = ["nbconvert", "astsearch"]
+requires-python = ">=3.4"
+
