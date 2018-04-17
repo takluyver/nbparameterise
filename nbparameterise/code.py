@@ -32,7 +32,7 @@ def get_driver_module(nb, override=None):
     if override:
         module_name = override
     else:
-        module_name = nb.metadata.get('kernelspec', {}).get('name', 'python3')
+        module_name = nb.metadata.get('language_info', {}).get('name', 'python')
     assert kernel_name_re.match(module_name)
     return importlib.import_module('nbparameterise.code_drivers.%s' % module_name)
 
