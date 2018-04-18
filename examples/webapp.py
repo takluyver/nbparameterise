@@ -6,7 +6,8 @@ To use this example, run::
     python3 webapp.py "Stock display.ipynb"
 
 The form fields are not hardcoded here; they are built from the notebook, so it
-should build a suitable form for any notebook you run this with.
+should build a suitable form for any notebook you run this with. Try it with
+Fibonacci.ipynb as well.
 """
 import os.path
 import sys
