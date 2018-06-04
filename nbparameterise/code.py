@@ -5,11 +5,12 @@ import re
 from nbconvert.preprocessors import ExecutePreprocessor
 
 class Parameter(object):
-    def __init__(self, name, vtype, value=None, metadata=None):
+    def __init__(self, name, vtype, value=None, comment=None,  metadata=None):
         self.name = name
         self.type = vtype
         self.value = value
         self.metadata = metadata or {}
+        self.comment = comment
 
     def __repr__(self):
         params = [repr(self.name), self.type.__name__]
@@ -20,6 +21,7 @@ class Parameter(object):
     def with_value(self, value):
         """Returns a copy with value set to a new value."""
         return type(self)(self.name, self.type, value, self.metadata or None)
+
 
 def first_code_cell(nb):
     for cell in nb.cells:
