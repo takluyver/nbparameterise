@@ -3,7 +3,7 @@ from setuptools import setup
 setup(
     name='nbparameterise',
     version='1.0xfel',
-    packages=['nbparameterise',],
+    packages=['nbparameterise','nbparameterise/code_drivers'],
     url='',
     author='Thomas, Kluyver, Steffen Hauf',
     author_email='steffen.hauf@xfel.eu',
