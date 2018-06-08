@@ -1,5 +1,3 @@
-  GNU nano 2.3.1                               File: ../../../karabo/extern/lib/python3.4/site-packages/nbparameterise/code_drivers/python3.py                                                                     
-
 import ast
 
 import astcheck
@@ -15,18 +13,20 @@ __all__ = ['extract_definitions', 'build_definitions']
 def check_list(node):
     def bool_check(node):
         return isinstance(node, ast.NameConstant) and (node.value in (True, False))
-    return all([(isinstance(n, (ast.Num, ast.Str))
-                 or bool_check(n)) for n in node.elts])
+    def neg_check(node):
+        return isinstance(node.operand, ast.Num) if isinstance(node, ast.UnaryOp) else False
+    return all([(isinstance(n, (ast.Num, ast.Str)) 
+                 or bool_check(n) or neg_check(n)) for n in node.elts])
 
 def check_fillable_node(node, path):
     if isinstance(node, (ast.Num, ast.Str)):
         return
-    elif (isinstance(node, ast.List)
+    elif (isinstance(node, ast.List) 
           and isinstance(node.ctx, ast.Load) and check_list(node)):
         return
     elif isinstance(node, ast.NameConstant) and (node.value in (True, False)):
         return
-
+    
     raise astcheck.ASTMismatch(path, node, 'number, string, list or boolean')
 
 definition_pattern = ast.Assign(targets=[ast.Name()], value=check_fillable_node)
@@ -39,7 +39,18 @@ def type_and_value(node, comments={}):
     elif isinstance(node, ast.Str):
         return str, node.s, comment
     elif isinstance(node, ast.List):
-        return list, [type_and_value(n)[1] for n in node.elts]
+        return list, [type_and_value(n)[1] for n in node.elts], comment
+    elif isinstance(node, ast.UnaryOp):
+        def apply_op(v, op):
+            if isinstance(op, ast.USub):
+               return -v
+            elif isinstance(op, ast.UAdd):
+               return v
+            elif isinstance(op, ast.Not):
+               return not v
+            elif isinstance(op, ast.Invert):
+               return ~v
+        return type(node.operand.n), apply_op(node.operand.n, node.op), comment
     return bool, node.value, comment
 
 def extract_comments(tokens):
