@@ -20,7 +20,8 @@ class Parameter(object):
 
     def with_value(self, value):
         """Returns a copy with value set to a new value."""
-        return type(self)(self.name, self.type, value, self.metadata or None)
+        return type(self)(self.name, self.type, value, 
+                          self.comment or None, self.metadata or None)
 
 
 def first_code_cell(nb):
