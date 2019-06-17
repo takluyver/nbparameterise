@@ -1,5 +1,5 @@
 import ast
-
+import re
 import astcheck
 import astsearch
 
@@ -26,6 +26,8 @@ def type_and_value(node):
     return (bool, node.value)
 
 def extract_definitions(cell):
+    # remove magic functions
+    cell = re.sub('^%','#',cell,0,re.MULTILINE)
     cell_ast = ast.parse(cell)
     for assign in astsearch.ASTPatternFinder(definition_pattern).scan_ast(cell_ast):
         yield Parameter(assign.targets[0].id, *type_and_value(assign.value))
