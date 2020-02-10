@@ -12,6 +12,16 @@ def check_fillable_node(node, path):
         return
     elif isinstance(node, ast.NameConstant) and (node.value in (True, False)):
         return
+    elif isinstance(node, (ast.List, ast.Tuple)):
+        for n in node.elts:
+            check_fillable_node(n, path)
+        return
+    elif isinstance(node, ast.Dict):
+        for n in node.keys:
+            check_fillable_node(n, path)
+        for n in node.values:
+            check_fillable_node(n, path)
+        return
     
     raise astcheck.ASTMismatch(path, node, 'number, string or boolean')
 
@@ -23,7 +33,16 @@ def type_and_value(node):
         return type(node.n), node.n
     elif isinstance(node, ast.Str):
         return str, node.s
-    return (bool, node.value)
+    elif isinstance(node, ast.NameConstant) and (node.value in (True, False)):
+        return (bool, node.value)
+    elif isinstance(node, ast.List):
+        return (list, [type_and_value(n)[1] for n in node.elts])
+    elif isinstance(node, ast.Tuple):
+        return (tuple, tuple(type_and_value(n)[1] for n in node.elts))
+    elif isinstance(node, ast.Dict):
+        return (dict, {type_and_value(node.keys[i])[1]: type_and_value(node.values[i])[1] for i in range(len(node.keys))})
+
+    raise NotImplementedError()
 
 def extract_definitions(cell):
     cell_ast = ast.parse(cell)
