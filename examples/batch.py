@@ -5,7 +5,7 @@
 from nbparameterise import extract_parameters, parameter_values, replace_definitions
 import nbformat
 
-stock_names = ['YHOO', 'MSFT', 'GOOG']
+stock_names = ['AAPL', 'MSFT', 'GOOG']
 
 with open("Stock display.ipynb") as f:
     nb = nbformat.read(f, as_version=4)
