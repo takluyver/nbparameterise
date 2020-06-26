@@ -1,6 +1,7 @@
 import copy
 import importlib
 import re
+from warnings import warn
 
 from nbconvert.preprocessors import ExecutePreprocessor
 
@@ -75,7 +76,7 @@ def parameter_values(params, **kwargs):
             res.append(p)
     return res
 
-def replace_definitions(nb, values, execute=True, execute_resources=None,
+def replace_definitions(nb, values, execute=None, execute_resources=None,
                         lang=None):
     """Return a copy of nb with the first code cell defining the given parameters.
 
@@ -90,6 +91,14 @@ def replace_definitions(nb, values, execute=True, execute_resources=None,
     lang may be used to override the kernel name embedded in the notebook. For
     now, nbparameterise only handles 'python3' and 'python2'.
     """
+    if execute is None:
+        warn(
+            "Default execute=True for replace_definitions will change in a "
+            "future version of nbparameterise. Pass execute=True if you need "
+            "execution.", stacklevel=2
+        )
+        execute = True
+
     nb = copy.deepcopy(nb)
     drv = get_driver_module(nb, override=lang)
     first_code_cell(nb).source = drv.build_definitions(values)

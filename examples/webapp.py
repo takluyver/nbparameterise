@@ -39,7 +39,9 @@ class SubmissionHandler(tornado.web.RequestHandler):
             defined.append(inp)
 
         res = {'path': os.path.dirname(self.application.path)}
-        nb = replace_definitions(self.application.nb, defined, execute_resources=res)
+        nb = replace_definitions(
+            self.application.nb, defined, execute=True, execute_resources=res
+        )
         output, _ = HTMLExporter().from_notebook_node(nb, res)
         self.write(output)
 

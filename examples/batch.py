@@ -17,7 +17,7 @@ for name in stock_names:
 
     # Update the parameters and run the notebook
     params = parameter_values(orig_parameters, stock=name)
-    new_nb = replace_definitions(nb, params)
+    new_nb = replace_definitions(nb, params, execute=True)
 
     # Save
     with open("Stock display %s.ipynb" % name, 'w') as f:
