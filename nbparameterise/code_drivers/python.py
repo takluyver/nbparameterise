@@ -12,7 +12,7 @@ def check_fillable_node(node, path):
         return
     elif isinstance(node, ast.NameConstant) and (node.value in (True, False)):
         return
-    elif isinstance(node, (ast.List, ast.Tuple)):
+    elif isinstance(node, ast.List):
         for n in node.elts:
             check_fillable_node(n, path)
         return
@@ -37,8 +37,6 @@ def type_and_value(node):
         return (bool, node.value)
     elif isinstance(node, ast.List):
         return (list, [type_and_value(n)[1] for n in node.elts])
-    elif isinstance(node, ast.Tuple):
-        return (tuple, tuple(type_and_value(n)[1] for n in node.elts))
     elif isinstance(node, ast.Dict):
         return (dict, {type_and_value(node.keys[i])[1]: type_and_value(node.values[i])[1] for i in range(len(node.keys))})
 

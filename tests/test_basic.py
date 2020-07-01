@@ -14,7 +14,7 @@ class BasicTestCase(unittest.TestCase):
         self.params = code.extract_parameters(self.nb)
 
     def test_extract(self):
-        assert len(self.params) == 7
+        assert len(self.params) == 6
 
         a = self.params[0]
         assert a.name == 'a'
@@ -42,13 +42,8 @@ class BasicTestCase(unittest.TestCase):
         assert e.type == list
         assert e.value == [0, 1.0, True, "text", [0, 1]]
 
-        f = self.params[5]
-        assert f.name == 'f'
-        assert f.type == tuple
-        assert f.value == (0, 1.0, True, "text", (0, 1))
-
-        g = self.params[6]
-        assert g.name == 'g'
+        g = self.params[5]
+        assert g.name == 'f'
         assert g.type == dict
         assert g.value == {0: 0, "item": True, "dict": {0: "text"}}
 
@@ -74,7 +69,7 @@ class BasicTestCase(unittest.TestCase):
             c = 12.0
         )
 
-        assert [p.name for p in params] == ['a', 'b', 'c', 'd', 'e', 'f', 'g']
+        assert [p.name for p in params] == ['a', 'b', 'c', 'd', 'e', 'f']
 
         assert params[0].value == 'New text'
         assert params[1].value == 12
