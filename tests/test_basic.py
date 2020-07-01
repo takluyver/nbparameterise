@@ -2,7 +2,7 @@ import os.path
 import unittest
 
 import nbformat
-from nbparameterise import code
+from nbparameterise import code, Parameter
 
 samplenb = os.path.join(os.path.dirname(__file__), 'sample.ipynb')
 
@@ -14,38 +14,14 @@ class BasicTestCase(unittest.TestCase):
         self.params = code.extract_parameters(self.nb)
 
     def test_extract(self):
-        assert len(self.params) == 6
-
-        a = self.params[0]
-        assert a.name == 'a'
-        assert a.type == str
-        assert a.value == "Some text"
-
-        b = self.params[1]
-        assert b.name == 'b'
-        assert b.type == int
-        assert b.value == 12
-
-        c = self.params[2]
-        assert c.name == 'c'
-        assert c.type == float
-        assert c.value == 14.0
-        assert c.metadata['display_name'] == 'Sea'
-
-        d = self.params[3]
-        assert d.name == 'd'
-        assert d.type == bool
-        assert d.value == False
-
-        e = self.params[4]
-        assert e.name == 'e'
-        assert e.type == list
-        assert e.value == [0, 1.0, True, "text", [0, 1]]
-
-        g = self.params[5]
-        assert g.name == 'f'
-        assert g.type == dict
-        assert g.value == {0: 0, "item": True, "dict": {0: "text"}}
+        assert self.params == [
+            Parameter('a', str, "Some text"),
+            Parameter('b', int, 12),
+            Parameter('c', float, 14.0),
+            Parameter('d', bool, False),
+            Parameter('e', list, [0, 1.0, True, "text", [0, 1]]),
+            Parameter('f', dict, {0: 0, "item": True, "dict": {0: "text"}}),
+        ]
 
     def test_rebuild(self):
         from_form = [

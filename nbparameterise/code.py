@@ -15,12 +15,22 @@ class Parameter(object):
     def __repr__(self):
         params = [repr(self.name), self.type.__name__]
         if self.value is not None:
-            params.append("value=%r" % self.value)
+            params.append(f"value={self.value!r}")
+        if self.metadata:
+            params.append(f"metadata={self.metadata!r}")
         return "Parameter(%s)" % ", ".join(params)
 
     def with_value(self, value):
         """Returns a copy with value set to a new value."""
         return type(self)(self.name, self.type, value, self.metadata or None)
+
+    def __eq__(self, other):
+        if isinstance(other, Parameter):
+            return (
+                self.name == other.name
+                and self.type == other.type
+                and self.value == other.value
+            )
 
 def first_code_cell(nb):
     for cell in nb.cells:
