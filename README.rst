@@ -16,6 +16,11 @@ This can be used for:
   the notebook when the user submits the form. See ``examples/webapp.py`` for
   an implementation of this with an HTML form.
 
+Nbparameterise can identify and replace numbers, strings, booleans (True/False),
+lists and dicts - the types which can be represented in JSON (apart from None).
+It's designed to change parameter values but keep their types, although this
+isn't enforced.
+
 Extra information about the parameters, such as names to display in a user
 interface, can be stored in notebook metadata.
 
