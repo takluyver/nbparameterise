@@ -14,6 +14,8 @@ class BasicTestCase(unittest.TestCase):
         self.params = code.extract_parameters(self.nb)
 
     def test_extract(self):
+        assert len(self.params) == 6
+
         a = self.params[0]
         assert a.name == 'a'
         assert a.type == str
@@ -34,6 +36,16 @@ class BasicTestCase(unittest.TestCase):
         assert d.name == 'd'
         assert d.type == bool
         assert d.value == False
+
+        e = self.params[4]
+        assert e.name == 'e'
+        assert e.type == list
+        assert e.value == [0, 1.0, True, "text", [0, 1]]
+
+        g = self.params[5]
+        assert g.name == 'f'
+        assert g.type == dict
+        assert g.value == {0: 0, "item": True, "dict": {0: "text"}}
 
     def test_rebuild(self):
         from_form = [
@@ -57,7 +69,7 @@ class BasicTestCase(unittest.TestCase):
             c = 12.0
         )
 
-        assert [p.name for p in params] == ['a', 'b', 'c', 'd']
+        assert [p.name for p in params] == ['a', 'b', 'c', 'd', 'e', 'f']
 
         assert params[0].value == 'New text'
         assert params[1].value == 12
