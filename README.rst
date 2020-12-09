@@ -31,6 +31,7 @@ Usage:
 
 .. code-block:: python
 
+    import nbclient
     import nbformat
     from nbparameterise import (
         extract_parameters, replace_definitions, parameter_values
@@ -45,5 +46,8 @@ Usage:
     # Update one or more parameters
     params = parameter_values(orig_parameters, stock='GOOG')
 
-    # Make a notebook object with these definitions, and execute it.
+    # Make a notebook object with these definitions
     new_nb = replace_definitions(nb, params)
+
+    # Execute the notebook with the new parameters
+    nbclient.execute(new_nb)
