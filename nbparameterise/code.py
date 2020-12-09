@@ -87,7 +87,7 @@ def parameter_values(params, **kwargs):
     return res
 
 def replace_definitions(nb, values, execute=None, execute_resources=None,
-                        lang=None):
+                        lang=None, kernel_name=None):
     """Return a copy of nb with the first code cell defining the given parameters.
 
     values should be a list of Parameter objects (as returned by extract_parameters),
@@ -114,5 +114,8 @@ def replace_definitions(nb, values, execute=None, execute_resources=None,
     first_code_cell(nb).source = drv.build_definitions(values)
     if execute:
         resources = execute_resources or {}
-        nb, resources = ExecutePreprocessor().preprocess(nb, resources)
+        if kernel_name:
+            nb, resources = ExecutePreprocessor(kernel_name=kernel_name).preprocess(nb, resources)
+        else:
+            nb, resources = ExecutePreprocessor().preprocess(nb, resources)
     return nb
