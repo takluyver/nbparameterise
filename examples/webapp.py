@@ -12,8 +12,9 @@ Fibonacci.ipynb as well.
 import os.path
 import sys
 
-import nbformat
+from nbclient import execute
 from nbconvert.exporters import HTMLExporter
+import nbformat
 import tornado.ioloop
 import tornado.web
 
@@ -38,19 +39,16 @@ class SubmissionHandler(tornado.web.RequestHandler):
                 inp = v.with_value(v.type(self.get_argument(v.name)))
             defined.append(inp)
 
-        res = {'path': os.path.dirname(self.application.path)}
-        nb = replace_definitions(
-            self.application.nb, defined, execute=True, execute_resources=res
-        )
-        output, _ = HTMLExporter().from_notebook_node(nb, res)
+        nb = replace_definitions(self.application.nb, defined)
+        nb = execute(nb, cwd=os.path.dirname(self.application.path))
+        output, _ = HTMLExporter().from_notebook_node(nb)
         self.write(output)
 
 
 class NbparameteriseApplication(tornado.web.Application):
     def __init__(self, path):
         self.path = path
-        with open(path) as f:
-            self.nb = nbformat.read(f, as_version=4)
+        self.nb = nbformat.read(path, as_version=4)
         
         basename = os.path.basename(path)
         assert basename.endswith('.ipynb')
