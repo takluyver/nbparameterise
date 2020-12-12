@@ -2,13 +2,13 @@
 """Example of using nbparameterise API to substitute variables in 'batch mode'
 """
 
-from nbparameterise import extract_parameters, parameter_values, replace_definitions
+from nbclient import execute
 import nbformat
+from nbparameterise import extract_parameters, parameter_values, replace_definitions
 
 stock_names = ['AAPL', 'MSFT', 'GOOG']
 
-with open("Stock display.ipynb") as f:
-    nb = nbformat.read(f, as_version=4)
+nb = nbformat.read("Stock display.ipynb", as_version=4)
 
 orig_parameters = extract_parameters(nb)
 
@@ -17,7 +17,8 @@ for name in stock_names:
 
     # Update the parameters and run the notebook
     params = parameter_values(orig_parameters, stock=name)
-    new_nb = replace_definitions(nb, params, execute=True)
+    new_nb = replace_definitions(nb, params)
+    execute(new_nb)
 
     # Save
     with open("Stock display %s.ipynb" % name, 'w') as f:
