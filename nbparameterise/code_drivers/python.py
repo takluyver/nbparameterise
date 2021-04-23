@@ -21,6 +21,8 @@ def check_list(node):
 def check_fillable_node(node, path):
     if isinstance(node, (ast.Num, ast.Str)):
         return
+    elif isinstance(node, ast.UnaryOp) and isinstance(node.operand, ast.Num):
+        return
     elif (isinstance(node, ast.List) 
           and isinstance(node.ctx, ast.Load) and check_list(node)):
         return
