@@ -26,6 +26,16 @@ def check_fillable_node(node, path):
         return
     elif isinstance(node, ast.NameConstant) and (node.value in (True, False)):
         return
+    elif isinstance(node, ast.List):
+        for n in node.elts:
+            check_fillable_node(n, path)
+        return
+    elif isinstance(node, ast.Dict):
+        for n in node.keys:
+            check_fillable_node(n, path)
+        for n in node.values:
+            check_fillable_node(n, path)
+        return
     
     raise astcheck.ASTMismatch(path, node, 'number, string, list or boolean')
 
@@ -40,6 +50,10 @@ def type_and_value(node, comments={}):
         return str, node.s, comment
     elif isinstance(node, ast.List):
         return list, [type_and_value(n)[1] for n in node.elts], comment
+    elif isinstance(node, ast.NameConstant) and (node.value in (True, False)):
+        return bool, node.value, comment
+    elif isinstance(node, ast.Dict):
+        return dict, {type_and_value(node.keys[i])[1]: type_and_value(node.values[i])[1] for i in range(len(node.keys))}, comment
     elif isinstance(node, ast.UnaryOp):
         def apply_op(v, op):
             if isinstance(op, ast.USub):

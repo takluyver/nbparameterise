@@ -1,6 +1,7 @@
 import copy
 import importlib
 import re
+from warnings import warn
 
 from nbconvert.preprocessors import ExecutePreprocessor
 
@@ -15,7 +16,9 @@ class Parameter(object):
     def __repr__(self):
         params = [repr(self.name), self.type.__name__]
         if self.value is not None:
-            params.append("value=%r" % self.value)
+            params.append(f"value={self.value!r}")
+        if self.metadata:
+            params.append(f"metadata={self.metadata!r}")
         return "Parameter(%s)" % ", ".join(params)
 
     def with_value(self, value):
@@ -23,6 +26,14 @@ class Parameter(object):
         return type(self)(self.name, self.type, value, 
                           self.comment or None, self.metadata or None)
 
+
+    def __eq__(self, other):
+        if isinstance(other, Parameter):
+            return (
+                self.name == other.name
+                and self.type == other.type
+                and self.value == other.value
+            )
 
 def first_code_cell(nb):
     for cell in nb.cells:
@@ -35,7 +46,7 @@ def get_driver_module(nb, override=None):
     if override:
         module_name = override
     else:
-        module_name = nb.metadata.get('kernelspec', {}).get('name', 'python3')
+        module_name = nb.metadata.get('language_info', {}).get('name', 'python')
     assert kernel_name_re.match(module_name)
     return importlib.import_module('nbparameterise.code_drivers.%s' % module_name)
 
@@ -78,7 +89,7 @@ def parameter_values(params, **kwargs):
             res.append(p)
     return res
 
-def replace_definitions(nb, values, execute=True, execute_resources=None,
+def replace_definitions(nb, values, execute=False, execute_resources=None,
                         lang=None):
     """Return a copy of nb with the first code cell defining the given parameters.
 

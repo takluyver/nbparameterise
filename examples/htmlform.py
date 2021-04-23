@@ -1,3 +1,8 @@
+"""Generate an HTML form based on notebook parameters.
+
+Used by webapp.py
+"""
+
 import htmlgen
 
 class Input(htmlgen.Element):
