@@ -24,7 +24,10 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip wheel
-          pip install . pytest
+          pip install . pytest pytest-cov
 
       - name: Run tests
-        run: pytest
+        run: pytest --cov=nbparameterise
+
+      - name: Upload coverage to codecov
+        uses: codecov/codecov-action@v1
