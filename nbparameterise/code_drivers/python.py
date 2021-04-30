@@ -39,7 +39,7 @@ def check_fillable_node(node, path):
             check_fillable_node(n, path)
         return
     
-    raise astcheck.ASTMismatch(path, node, 'number, string, list or boolean')
+    raise astcheck.ASTMismatch(path, node, 'number, string, boolean, list or dict')
 
 definition_pattern = ast.Assign(targets=[ast.Name()], value=check_fillable_node)
 

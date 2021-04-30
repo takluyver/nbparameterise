@@ -1,7 +1,6 @@
 import copy
 import importlib
 import re
-from warnings import warn
 
 from nbconvert.preprocessors import ExecutePreprocessor
 
