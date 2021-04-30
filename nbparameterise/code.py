@@ -6,11 +6,12 @@ from warnings import warn
 from nbconvert.preprocessors import ExecutePreprocessor
 
 class Parameter(object):
-    def __init__(self, name, vtype, value=None, metadata=None):
+    def __init__(self, name, vtype, value=None, metadata=None, comment=None):
         self.name = name
         self.type = vtype
         self.value = value
         self.metadata = metadata or {}
+        self.comment = comment
 
     def __repr__(self):
         params = [repr(self.name), self.type.__name__]
@@ -18,11 +19,15 @@ class Parameter(object):
             params.append(f"value={self.value!r}")
         if self.metadata:
             params.append(f"metadata={self.metadata!r}")
+        if self.comment:
+            params.append(f"comment={self.comment!r}")
         return "Parameter(%s)" % ", ".join(params)
 
     def with_value(self, value):
         """Returns a copy with value set to a new value."""
-        return type(self)(self.name, self.type, value, self.metadata or None)
+        return type(self)(
+            self.name, self.type, value,  self.metadata or None, self.comment
+        )
 
     def __eq__(self, other):
         if isinstance(other, Parameter):
@@ -87,7 +92,7 @@ def parameter_values(params, **kwargs):
     return res
 
 def replace_definitions(nb, values, execute=False, execute_resources=None,
-                        lang=None):
+                        lang=None, *, comments=True):
     """Return a copy of nb with the first code cell defining the given parameters.
 
     values should be a list of Parameter objects (as returned by extract_parameters),
@@ -100,10 +105,13 @@ def replace_definitions(nb, values, execute=False, execute_resources=None,
 
     lang may be used to override the kernel name embedded in the notebook. For
     now, nbparameterise only handles 'python3' and 'python2'.
+
+    If comment is True, comments attached to the parameters will be included
+    in the replaced code, on the same line as the definition.
     """
     nb = copy.deepcopy(nb)
     drv = get_driver_module(nb, override=lang)
-    first_code_cell(nb).source = drv.build_definitions(values)
+    first_code_cell(nb).source = drv.build_definitions(values, comments=comments)
     if execute:
         resources = execute_resources or {}
         nb, resources = ExecutePreprocessor().preprocess(nb, resources)
