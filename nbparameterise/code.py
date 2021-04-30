@@ -6,7 +6,7 @@ from warnings import warn
 from nbconvert.preprocessors import ExecutePreprocessor
 
 class Parameter(object):
-    def __init__(self, name, vtype, value=None, comment=None,  metadata=None):
+    def __init__(self, name, vtype, value=None, metadata=None, comment=None):
         self.name = name
         self.type = vtype
         self.value = value
@@ -19,13 +19,15 @@ class Parameter(object):
             params.append(f"value={self.value!r}")
         if self.metadata:
             params.append(f"metadata={self.metadata!r}")
+        if self.comment:
+            params.append(f"comment={self.comment!r}")
         return "Parameter(%s)" % ", ".join(params)
 
     def with_value(self, value):
         """Returns a copy with value set to a new value."""
-        return type(self)(self.name, self.type, value, 
-                          self.comment or None, self.metadata or None)
-
+        return type(self)(
+            self.name, self.type, value,  self.metadata or None, self.comment
+        )
 
     def __eq__(self, other):
         if isinstance(other, Parameter):

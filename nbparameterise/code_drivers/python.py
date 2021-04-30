@@ -81,7 +81,8 @@ def extract_definitions(cell):
     cell_tokens = tokenize.tokenize(BytesIO(cell.encode('utf-8')).readline)
     comments = extract_comments(cell_tokens)
     for assign in astsearch.ASTPatternFinder(definition_pattern).scan_ast(cell_ast):
-        yield Parameter(assign.targets[0].id, *type_and_value(assign.value, comments))
+        typ, val, comment = type_and_value(assign.value, comments)
+        yield Parameter(assign.targets[0].id, typ, val, comment=comment)
 
 def build_definitions(inputs):
     return "\n".join("{0.name} = {0.value!r}".format(i) for i in inputs)
