@@ -60,3 +60,11 @@ class BasicTestCase(unittest.TestCase):
         assert params[3].value == 12.0
         assert isinstance(params[3].value, float)
         assert params[4].value == False
+
+
+def test_parameter_repr():
+    p = Parameter('days', int, 7, metadata={'foo': 'boo'}, comment='# Days to show')
+    p2 = eval(repr(p))  # The repr should eval to an identical Parameter
+    assert p2 == p
+    assert p2.metadata == p.metadata
+    assert p2.comment == p.comment
