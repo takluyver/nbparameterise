@@ -3,7 +3,7 @@ import ast
 import astcheck
 import astsearch
 
-from io import BytesIO
+from io import StringIO
 import tokenize
 
 from ..code import Parameter
@@ -69,8 +69,9 @@ def type_and_value(node, comments={}):
         return type(node.operand.n), apply_op(node.operand.n, node.op), comment
     return bool, node.value, comment
 
-def extract_comments(tokens):
+def extract_comments(cell: str):
     comments = {}
+    tokens = tokenize.generate_tokens(StringIO(cell).readline)
     for ttype, tstr, rowcol, _, _ in tokens:
         if ttype == tokenize.COMMENT:
            comments[rowcol[0]] = tstr
@@ -78,8 +79,7 @@ def extract_comments(tokens):
 
 def extract_definitions(cell):
     cell_ast = ast.parse(cell)
-    cell_tokens = tokenize.tokenize(BytesIO(cell.encode('utf-8')).readline)
-    comments = extract_comments(cell_tokens)
+    comments = extract_comments(cell)
     for assign in astsearch.ASTPatternFinder(definition_pattern).scan_ast(cell_ast):
         typ, val, comment = type_and_value(assign.value, comments)
         yield Parameter(assign.targets[0].id, typ, val, comment=comment)
