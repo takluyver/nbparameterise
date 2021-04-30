@@ -25,6 +25,7 @@ class BasicTestCase(unittest.TestCase):
         ]
         assert self.params[4].comment == '# comment:bool'
         assert self.params[6].comment == '# comment:dict'
+        assert self.params[3].metadata == {'display_name': 'Sea'}
 
     def test_rebuild(self):
         from_form = [
