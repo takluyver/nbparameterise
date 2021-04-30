@@ -37,6 +37,8 @@ class BasicTestCase(unittest.TestCase):
         ]
         nb = code.replace_definitions(self.nb, from_form, execute=False)
 
+        assert "# comment:bool" in nb.cells[0].source
+
         ns = {}
         exec(nb.cells[0].source, ns)
         assert ns['a'] == "New text"

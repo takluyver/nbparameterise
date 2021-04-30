@@ -84,5 +84,13 @@ def extract_definitions(cell):
         typ, val, comment = type_and_value(assign.value, comments)
         yield Parameter(assign.targets[0].id, typ, val, comment=comment)
 
-def build_definitions(inputs):
-    return "\n".join("{0.name} = {0.value!r}".format(i) for i in inputs)
+def build_definitions(inputs, comments=True):
+    defs = []
+    for param in inputs:
+        s = f"{param.name} = {param.value!r}"
+        if comments and param.comment:
+            comment = param.comment if param.comment.startswith('#') \
+                else '# ' + param.comment.lstrip()
+            s +=     f"  {comment}"
+        defs.append(s)
+    return "\n".join(defs)

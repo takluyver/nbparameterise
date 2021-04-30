@@ -92,7 +92,7 @@ def parameter_values(params, **kwargs):
     return res
 
 def replace_definitions(nb, values, execute=False, execute_resources=None,
-                        lang=None):
+                        lang=None, *, comments=True):
     """Return a copy of nb with the first code cell defining the given parameters.
 
     values should be a list of Parameter objects (as returned by extract_parameters),
@@ -105,10 +105,13 @@ def replace_definitions(nb, values, execute=False, execute_resources=None,
 
     lang may be used to override the kernel name embedded in the notebook. For
     now, nbparameterise only handles 'python3' and 'python2'.
+
+    If comment is True, comments attached to the parameters will be included
+    in the replaced code, on the same line as the definition.
     """
     nb = copy.deepcopy(nb)
     drv = get_driver_module(nb, override=lang)
-    first_code_cell(nb).source = drv.build_definitions(values)
+    first_code_cell(nb).source = drv.build_definitions(values, comments=comments)
     if execute:
         resources = execute_resources or {}
         nb, resources = ExecutePreprocessor().preprocess(nb, resources)
