@@ -1,17 +1,20 @@
 [build-system]
-requires = ["flit_core >=2,<4"]
+requires = ["flit_core >=3.2,<3.3"]
 build-backend = "flit_core.buildapi"
 
-[tool.flit.metadata]
-module = "nbparameterise"
-author = "Thomas Kluyver"
-author-email = "thomas@kluyver.me.uk"
-home-page = "https://github.com/takluyver/nbparameterise"
+[project]
+name = "nbparameterise"
+authors = [
+    {name = "Thomas Kluyver", email = "thomas@kluyver.me.uk"},
+]
 classifiers = [
     "License :: OSI Approved :: MIT License",
     "Framework :: Jupyter",
 ]
-description-file = "README.rst"
-requires = ["nbconvert", "astsearch"]
+readme = "README.rst"
+dependencies = ["nbconvert", "astsearch"]
 requires-python = ">=3.6"
+dynamic = ['version', 'description']
 
+[project.urls]
+Source = "https://github.com/takluyver/nbparameterise"
