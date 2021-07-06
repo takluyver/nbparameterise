@@ -2,6 +2,11 @@ import ast
 
 import astcheck
 
+try:
+    from ast import unparse
+except ImportError:
+    from astunparse import unparse
+
 from io import StringIO
 import tokenize
 
@@ -91,13 +96,28 @@ def extract_definitions(cell):
             yield Parameter(name, typ, val, comment=comment)
 
 
-def build_definitions(inputs, comments=True):
-    defs = []
+def extract_remainder(cell: str):
+    cell_ast = ast.parse(cell)
+    for stmt in cell_ast.body:
+        if not astcheck.is_ast_like(stmt, definition_pattern):
+            yield stmt
+
+def build_definitions(inputs, comments=True, prev_code=None):
+    new_code = []
     for param in inputs:
         s = f"{param.name} = {param.value!r}"
         if comments and param.comment:
             comment = param.comment if param.comment.startswith('#') \
                 else '# ' + param.comment.lstrip()
             s +=     f"  {comment}"
-        defs.append(s)
-    return "\n".join(defs)
+        new_code.append(s)
+
+    if prev_code:
+        remainder = list(extract_remainder(prev_code))
+        if remainder:
+            new_code.extend([
+                '',
+                unparse(remainder),
+            ])
+
+    return "\n".join(new_code)

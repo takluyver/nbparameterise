@@ -134,8 +134,12 @@ def replace_definitions(nb, values, execute=False, execute_resources=None,
         values = list(values.values())
 
     nb = copy.deepcopy(nb)
+    params_cell = first_code_cell(nb)
+
     drv = get_driver_module(nb, override=lang)
-    first_code_cell(nb).source = drv.build_definitions(values, comments=comments)
+    params_cell.source = drv.build_definitions(
+        values, comments=comments, prev_code=params_cell.source
+    )
     if execute:
         resources = execute_resources or {}
         nb, resources = ExecutePreprocessor().preprocess(nb, resources)
