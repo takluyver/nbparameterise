@@ -51,6 +51,19 @@ def get_driver_module(nb, override=None):
     assert kernel_name_re.match(module_name)
     return importlib.import_module('nbparameterise.code_drivers.%s' % module_name)
 
+def extract_parameter_dict(nb, lang=None):
+    """Returns a dictionary of Parameter objects derived from the notebook.
+
+    This looks for assignments (like 'n = 50') in the first code cell of the
+    notebook. The parameters may also have some metadata stored in the notebook
+    metadata; this will be attached as the .metadata instance on each one.
+
+    lang may be used to override the kernel name embedded in the notebook. For
+    now, nbparameterise only handles 'python'.
+    """
+    params = extract_parameters(nb, lang)
+    return {p.name: p for p in params}
+
 def extract_parameters(nb, lang=None):
     """Returns a list of Parameter instances derived from the notebook.
 
@@ -59,7 +72,7 @@ def extract_parameters(nb, lang=None):
     metadata; this will be attached as the .metadata instance on each one.
 
     lang may be used to override the kernel name embedded in the notebook. For
-    now, nbparameterise only handles 'python3' and 'python2'.
+    now, nbparameterise only handles 'python'.
     """
     drv = get_driver_module(nb, override=lang)
     params = list(drv.extract_definitions(first_code_cell(nb).source))
@@ -71,7 +84,7 @@ def extract_parameters(nb, lang=None):
     return params
 
 def parameter_values(params, **kwargs):
-    """Return a copy of the parameter list, substituting values from kwargs.
+    """Return a new parameter list/dict, substituting values from kwargs.
 
     Usage example::
 
@@ -81,7 +94,15 @@ def parameter_values(params, **kwargs):
         )
 
     Any parameters not supplied will keep their original value.
+
+    This can be used with either a dict from :func:`extract_parameter_dict`
+    or a list from :func:`extract_parameters`. It will return the corresponding
+    container type.
     """
+    if isinstance(params, dict):
+        new_list = parameter_values(params.values(), **kwargs)
+        return {p.name: p for p in new_list}
+
     res = []
     for p in params:
         if p.name in kwargs:
@@ -94,7 +115,8 @@ def replace_definitions(nb, values, execute=False, execute_resources=None,
                         lang=None, *, comments=True):
     """Return a copy of nb with the first code cell defining the given parameters.
 
-    values should be a list of Parameter objects (as returned by extract_parameters),
+    values should be a dict (from :func:`extract_parameter_dict`) or a list
+    (from :func:`extract_parameters`) of :class:`Parameter` objects,
     with their .value attribute set to the desired value.
 
     If execute is True, the notebook is executed with the new values.
@@ -108,6 +130,9 @@ def replace_definitions(nb, values, execute=False, execute_resources=None,
     If comment is True, comments attached to the parameters will be included
     in the replaced code, on the same line as the definition.
     """
+    if isinstance(values, dict):
+        values = list(values.values())
+
     nb = copy.deepcopy(nb)
     drv = get_driver_module(nb, override=lang)
     first_code_cell(nb).source = drv.build_definitions(values, comments=comments)

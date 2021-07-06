@@ -12,6 +12,7 @@ class BasicTestCase(unittest.TestCase):
             self.nb = nbformat.read(f, as_version=4)
 
         self.params = code.extract_parameters(self.nb)
+        self.param_dict = code.extract_parameter_dict(self.nb)
 
     def test_extract(self):
         assert self.params == [
@@ -26,6 +27,17 @@ class BasicTestCase(unittest.TestCase):
         assert self.params[4].comment == '# comment:bool'
         assert self.params[6].comment == '# comment:dict'
         assert self.params[3].metadata == {'display_name': 'Sea'}
+
+    def test_extract_dict(self):
+        assert self.param_dict == {
+            'a': Parameter('a', str, "Some text"),
+            'b': Parameter('b', int, 12),
+            'b2': Parameter('b2', int, -7),
+            'c': Parameter('c', float, 14.0),
+            'd': Parameter('d', bool, False),
+            'e': Parameter('e', list, [0, 1.0, True, "text", [0, 1]]),
+            'f': Parameter('f', dict, {0: 0, "item": True, "dict": {0: "text"}}),
+        }
 
     def test_rebuild(self):
         from_form = [
@@ -47,6 +59,21 @@ class BasicTestCase(unittest.TestCase):
         assert ns['c'] == 0.25
         assert ns['d'] == True
 
+    def test_rebuild_from_dict(self):
+        new_params = self.param_dict.copy()
+        new_params['c'] = self.param_dict['c'].with_value(0.75)
+        new_params['e'] = self.param_dict['e'].with_value([5, 6, 7, 8])
+
+        nb = code.replace_definitions(self.nb, new_params, execute=False)
+
+        assert "# comment:bool" in nb.cells[0].source
+
+        ns = {}
+        exec(nb.cells[0].source, ns)
+        assert ns['a'] == "Some text"
+        assert ns['b'] == 12
+        assert ns['c'] == 0.75
+        assert ns['e'] == [5, 6, 7, 8]
     def test_new_values(self):
         params = code.parameter_values(self.params,
             a = "New text",
@@ -60,6 +87,22 @@ class BasicTestCase(unittest.TestCase):
         assert params[3].value == 12.0
         assert isinstance(params[3].value, float)
         assert params[4].value == False
+
+    def test_new_values_dict(self):
+        new_dict = code.parameter_values(self.param_dict,
+            a = "New text",
+            c = 12.0
+        )
+
+        assert new_dict == {
+            'a': Parameter('a', str, "New text"),
+            'b': Parameter('b', int, 12),
+            'b2': Parameter('b2', int, -7),
+            'c': Parameter('c', float, 12.0),
+            'd': Parameter('d', bool, False),
+            'e': Parameter('e', list, [0, 1.0, True, "text", [0, 1]]),
+            'f': Parameter('f', dict, {0: 0, "item": True, "dict": {0: "text"}}),
+        }
 
 
 def test_parameter_repr():
