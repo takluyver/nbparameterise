@@ -12,7 +12,10 @@ classifiers = [
     "Framework :: Jupyter",
 ]
 readme = "README.rst"
-dependencies = ["nbconvert", "astsearch"]
+dependencies = [
+    "nbconvert",
+    "astcheck >=0.3",
+]
 requires-python = ">=3.6"
 dynamic = ['version', 'description']
 

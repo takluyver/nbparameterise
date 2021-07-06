@@ -1,7 +1,6 @@
 import ast
 
 import astcheck
-import astsearch
 
 from io import StringIO
 import tokenize
@@ -41,7 +40,7 @@ def check_fillable_node(node, path):
     
     raise astcheck.ASTMismatch(path, node, 'number, string, boolean, list or dict')
 
-definition_pattern = ast.Assign(targets=[ast.Name()], value=check_fillable_node)
+definition_pattern = astcheck.single_assign(target=ast.Name(), value=check_fillable_node)
 
 def type_and_value(node, comments={}):
     comment = comments.get(node.lineno, None)
@@ -80,9 +79,17 @@ def extract_comments(cell: str):
 def extract_definitions(cell):
     cell_ast = ast.parse(cell)
     comments = extract_comments(cell)
-    for assign in astsearch.ASTPatternFinder(definition_pattern).scan_ast(cell_ast):
-        typ, val, comment = type_and_value(assign.value, comments)
-        yield Parameter(assign.targets[0].id, typ, val, comment=comment)
+
+    # We only want global assignments, so we're not walking the AST here.
+    for stmt in cell_ast.body:
+        if astcheck.is_ast_like(stmt, definition_pattern):
+            if isinstance(stmt, ast.AnnAssign):
+                name = stmt.target.id
+            else:  # ast.Assign
+                name = stmt.targets[0].id
+            typ, val, comment = type_and_value(stmt.value, comments)
+            yield Parameter(name, typ, val, comment=comment)
+
 
 def build_definitions(inputs, comments=True):
     defs = []
