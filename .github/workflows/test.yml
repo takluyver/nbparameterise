@@ -30,4 +30,4 @@ jobs:
         run: pytest --cov=nbparameterise
 
       - name: Upload coverage to codecov
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v2
