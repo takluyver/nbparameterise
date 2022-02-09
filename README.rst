@@ -52,4 +52,4 @@ Usage:
     # Execute the notebook with the new parameters
     nbclient.execute(new_nb)
 
-If you are interested in using your parameterized Jupyter notebooks through a command line interface, have a look at `nblick <https://github.com/ssciwr/nbclick>`_.
+If you are interested in using your parameterized Jupyter notebooks through a command line interface, have a look at `nbclick <https://github.com/ssciwr/nbclick>`_.
