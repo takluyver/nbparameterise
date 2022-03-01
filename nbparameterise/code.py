@@ -45,7 +45,6 @@ def findFirstParametersTaggedCell(nb):
 def first_code_cell(nb):
     for cell in nb.cells:
         if cell.cell_type == 'code':
-            print(cell)
             return cell
 
 kernel_name_re = re.compile(r'\w+$')
