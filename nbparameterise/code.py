@@ -121,7 +121,11 @@ def replace_definitions(nb, values, execute=False, execute_resources=None,
     """
     nb = copy.deepcopy(nb)
     drv = get_driver_module(nb, override=lang)
-    first_code_cell(nb).source = drv.build_definitions(values, comments=comments)
+    cell = findFirstParametersTaggedCell(nb)
+    if cell is None:
+        cell = first_code_cell(nb)
+        
+    cell.source = drv.build_definitions(values, comments=comments)
     if execute:
         resources = execute_resources or {}
         nb, resources = ExecutePreprocessor().preprocess(nb, resources)
