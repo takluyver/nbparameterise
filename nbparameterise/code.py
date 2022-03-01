@@ -35,7 +35,12 @@ class Parameter(object):
                 and self.type == other.type
                 and self.value == other.value
             )
-
+def findFirstParametersTaggedCell(nb):
+    for cell in nb.cells:
+        if 'metadata' in cell:
+            if 'tags' in cell['metadata']:
+                if any([i.lower()=="parameters" for i in cell['metadata']['tags']]):
+                    return cell
 def first_code_cell(nb):
     for cell in nb.cells:
         if cell.cell_type == 'code':
@@ -63,7 +68,10 @@ def extract_parameters(nb, lang=None):
     now, nbparameterise only handles 'python3' and 'python2'.
     """
     drv = get_driver_module(nb, override=lang)
-    params = list(drv.extract_definitions(first_code_cell(nb).source))
+    params = list(drv.extract_definitions(findFirstParametersTaggedCell(nb).source))
+    if len(params)==0:
+        params = list(drv.extract_definitions(first_code_cell(nb).source))
+    
 
     # Add extra info from notebook metadata
     for param in params:
