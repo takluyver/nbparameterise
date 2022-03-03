@@ -42,9 +42,12 @@ def findFirstParametersTaggedCell(nb):
                 if any([i.lower()=="parameters" for i in cell['metadata']['tags']]):
                     return cell
                 
+
 def first_code_cell(nb):
     for cell in nb.cells:
         if cell.cell_type == 'code':
+            if 'import' in cell.source:
+                continue
             return cell
 
 kernel_name_re = re.compile(r'\w+$')
@@ -72,6 +75,9 @@ def extract_parameters(nb, lang=None):
     if cell is None:
         cell = first_code_cell(nb)
         
+    if cell is None:
+        return {}
+    
     params = list(drv.extract_definitions(cell.source))
     
 
@@ -119,12 +125,16 @@ def replace_definitions(nb, values, execute=False, execute_resources=None,
     If comment is True, comments attached to the parameters will be included
     in the replaced code, on the same line as the definition.
     """
+    if values is None:
+        return nb
     nb = copy.deepcopy(nb)
     drv = get_driver_module(nb, override=lang)
     cell = findFirstParametersTaggedCell(nb)
     if cell is None:
         cell = first_code_cell(nb)
         
+    if cell is None:
+        return nb
     cell.source = drv.build_definitions(values, comments=comments)
     if execute:
         resources = execute_resources or {}
