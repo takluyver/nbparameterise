@@ -5,7 +5,6 @@ import astsearch
 
 from io import StringIO
 import tokenize
-from types import NoneType
 
 from ..code import Parameter
 
@@ -58,7 +57,7 @@ def type_and_value(node, comments={}):
     elif isinstance(node, ast.NameConstant) and (node.value in (True, False)):
         return bool, node.value, comment
     elif isinstance(node, ast.NameConstant) and (node.value is None):
-        return NoneType, node.value, comment
+        return type(None), node.value, comment
     elif isinstance(node, ast.Dict):
         return dict, {type_and_value(node.keys[i])[1]: type_and_value(node.values[i])[1] for i in range(len(node.keys))}, comment
     elif isinstance(node, ast.UnaryOp):
