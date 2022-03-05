@@ -27,6 +27,14 @@ interface, can be stored in notebook metadata.
 Nbparameterise is written in Python 3, but it can handle notebooks that use
 Python 2.
 
+
+Additional Method of cell selection:
+
+Add a tag called "parameters" to the cell you want to use for the parameters
+Notice: Additionally tagged cells will be ignored
+
+
+
 Usage:
 
 .. code-block:: python
