@@ -52,7 +52,8 @@ class BasicTestCase(unittest.TestCase):
     def test_new_values(self):
         params = code.parameter_values(self.params,
             a = "New text",
-            c = 12.0
+            c = 12.0,
+            g = "Not none",
         )
 
         assert [p.name for p in params] == ['a', 'b', 'b2', 'c', 'd', 'e', 'f', 'g']
@@ -62,6 +63,7 @@ class BasicTestCase(unittest.TestCase):
         assert params[3].value == 12.0
         assert isinstance(params[3].value, float)
         assert params[4].value == False
+        assert params[7].value == "Not none"
 
 
 def test_parameter_repr():
