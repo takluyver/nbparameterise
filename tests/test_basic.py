@@ -1,4 +1,5 @@
 import os.path
+from types import NoneType
 import unittest
 
 import nbformat
@@ -22,6 +23,7 @@ class BasicTestCase(unittest.TestCase):
             Parameter('d', bool, False),
             Parameter('e', list, [0, 1.0, True, "text", [0, 1]]),
             Parameter('f', dict, {0: 0, "item": True, "dict": {0: "text"}}),
+            Parameter('g', NoneType, None),
         ]
         assert self.params[4].comment == '# comment:bool'
         assert self.params[6].comment == '# comment:dict'
@@ -53,7 +55,7 @@ class BasicTestCase(unittest.TestCase):
             c = 12.0
         )
 
-        assert [p.name for p in params] == ['a', 'b', 'b2', 'c', 'd', 'e', 'f']
+        assert [p.name for p in params] == ['a', 'b', 'b2', 'c', 'd', 'e', 'f', 'g']
 
         assert params[0].value == 'New text'
         assert params[1].value == 12
