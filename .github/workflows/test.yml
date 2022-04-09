@@ -27,7 +27,7 @@ jobs:
           pip install . pytest pytest-cov
 
       - name: Run tests
-        run: pytest --cov=nbparameterise
+        run: pytest --cov=nbparameterise --cov-report=xml
 
       - name: Upload coverage to codecov
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v2
