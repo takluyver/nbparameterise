@@ -2,17 +2,16 @@ import os.path
 import unittest
 
 import nbformat
-from nbparameterise import code, Parameter
+from nbparameterise import code, Parameter,get_parameter_cell
 
 samplenb = os.path.join(os.path.dirname(__file__), 'sample_parameters_tag.ipynb')
 
-class BasicTestCase(unittest.TestCase):
+class BasicParameterTestCase(unittest.TestCase):
     def setUp(self):
         with open(samplenb) as f:
             self.nb = nbformat.read(f, as_version=4)
 
         self.params = code.extract_parameters(self.nb)
-        print(self.params)
 
     def test_extract(self):
         assert self.params == [
@@ -37,11 +36,11 @@ class BasicTestCase(unittest.TestCase):
             self.params[4].with_value(True),
         ]
         nb = code.replace_definitions(self.nb, from_form, execute=False)
-
-        assert "# comment:bool" in nb.cells[0].source
+        cell = get_parameter_cell(nb,'Parameters')
+        assert "# comment:bool" in cell.source
 
         ns = {}
-        exec(nb.cells[0].source, ns)
+        exec(cell.source, ns)
         assert ns['a'] == "New text"
         assert ns['b'] == 21
         assert ns['b2'] == -3

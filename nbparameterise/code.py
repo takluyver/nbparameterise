@@ -36,7 +36,12 @@ class Parameter(object):
                 and self.value == other.value
             )
 
-            
+def get_parameter_cell(nb, tag):
+    cell = find_first_tagged_cell(nb,tag)
+    if cell is None:
+        cell = first_code_cell(nb)
+    return cell
+
 def find_first_tagged_cell(nb,tag):
     for cell in nb.cells:
         if cell.cell_type == 'code':
@@ -60,7 +65,7 @@ def get_driver_module(nb, override=None):
     assert kernel_name_re.match(module_name)
     return importlib.import_module('nbparameterise.code_drivers.%s' % module_name)
 
-def extract_parameters(nb, lang=None,tag='Parameters'):
+def extract_parameters(nb, lang=None, tag='Parameters'):
     """Returns a list of Parameter instances derived from the notebook.
 
     This looks for assignments (like 'n = 50') in the first code cell of the
@@ -71,9 +76,7 @@ def extract_parameters(nb, lang=None,tag='Parameters'):
     now, nbparameterise only handles 'python3' and 'python2'.
     """
     drv = get_driver_module(nb, override=lang)
-    cell = find_first_tagged_cell(nb,tag)
-    if cell is None:
-        cell = first_code_cell(nb)
+    cell = get_parameter_cell(nb,tag) 
     
     params = list(drv.extract_definitions(cell.source))
     
@@ -105,7 +108,7 @@ def parameter_values(params, **kwargs):
     return res
 
 def replace_definitions(nb, values, execute=False, execute_resources=None,
-                        lang=None, *, comments=True,tag='Parameters'):
+                        lang=None, *, comments=True, tag='Parameters'):
     """Return a copy of nb with the first code cell defining the given parameters.
 
     values should be a list of Parameter objects (as returned by extract_parameters),
@@ -124,10 +127,7 @@ def replace_definitions(nb, values, execute=False, execute_resources=None,
     """
     nb = copy.deepcopy(nb)
     drv = get_driver_module(nb, override=lang)
-    cell = find_first_tagged_cell(nb,tag)
-    if cell is None:
-        cell = first_code_cell(nb)
-        
+    cell = get_parameter_cell(nb,tag)        
     cell.source = drv.build_definitions(values, comments=comments)
     if execute:
         resources = execute_resources or {}
