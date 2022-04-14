@@ -1,5 +1,6 @@
 This is a tool to run notebooks with input values. When you write the notebook,
-these are defined in the first code cell, with regular assignments like this:
+these are defined in the first code cell, or a cell the a 'parameters' tag.
+with regular assignments like this:
 
 .. code-block:: python
 
@@ -26,13 +27,6 @@ interface, can be stored in notebook metadata.
 
 Nbparameterise is written in Python 3, but it can handle notebooks that use
 Python 2.
-
-
-Additional Method of cell selection:
-
-Add a tag called "parameters" to the cell you want to use for the parameters
-Notice: Additionally tagged cells will be ignored
-
 
 
 Usage:
