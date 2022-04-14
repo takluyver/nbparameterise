@@ -40,12 +40,8 @@ class Parameter(object):
 def find_first_tagged_cell(nb,tag):
     for cell in nb.cells:
         if cell.cell_type == 'code':
-            metadata = cell.get('metadata', {})
-            tags = metadata.get('tags', [])
-            print('tags',tags)
-            print('tag',tag)
-            print([i==tag for i in tags])
-            if any([i.lower()==tag for i in tags]):
+            tags = cell.get('metadata', {}).get('tags', [])
+            if any([i == tag for i in tags]):
                 return cell
                 
 
