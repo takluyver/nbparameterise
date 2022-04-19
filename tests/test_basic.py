@@ -22,6 +22,7 @@ class BasicTestCase(unittest.TestCase):
             Parameter('d', bool, False),
             Parameter('e', list, [0, 1.0, True, "text", [0, 1]]),
             Parameter('f', dict, {0: 0, "item": True, "dict": {0: "text"}}),
+            Parameter('g', type(None), None),
         ]
         assert self.params[4].comment == '# comment:bool'
         assert self.params[6].comment == '# comment:dict'
@@ -50,16 +51,18 @@ class BasicTestCase(unittest.TestCase):
     def test_new_values(self):
         params = code.parameter_values(self.params,
             a = "New text",
-            c = 12.0
+            c = 12.0,
+            g = "Not none",
         )
 
-        assert [p.name for p in params] == ['a', 'b', 'b2', 'c', 'd', 'e', 'f']
+        assert [p.name for p in params] == ['a', 'b', 'b2', 'c', 'd', 'e', 'f', 'g']
 
         assert params[0].value == 'New text'
         assert params[1].value == 12
         assert params[3].value == 12.0
         assert isinstance(params[3].value, float)
         assert params[4].value == False
+        assert params[7].value == "Not none"
 
 
 def test_parameter_repr():

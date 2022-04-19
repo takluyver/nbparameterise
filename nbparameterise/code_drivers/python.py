@@ -28,6 +28,8 @@ def check_fillable_node(node, path):
         return
     elif isinstance(node, ast.NameConstant) and (node.value in (True, False)):
         return
+    elif isinstance(node, ast.NameConstant) and (node.value is None):
+        return
     elif isinstance(node, ast.List):
         for n in node.elts:
             check_fillable_node(n, path)
@@ -39,7 +41,7 @@ def check_fillable_node(node, path):
             check_fillable_node(n, path)
         return
     
-    raise astcheck.ASTMismatch(path, node, 'number, string, boolean, list or dict')
+    raise astcheck.ASTMismatch(path, node, 'none, number, string, boolean, list or dict')
 
 definition_pattern = ast.Assign(targets=[ast.Name()], value=check_fillable_node)
 
@@ -54,6 +56,8 @@ def type_and_value(node, comments={}):
         return list, [type_and_value(n)[1] for n in node.elts], comment
     elif isinstance(node, ast.NameConstant) and (node.value in (True, False)):
         return bool, node.value, comment
+    elif isinstance(node, ast.NameConstant) and (node.value is None):
+        return type(None), node.value, comment
     elif isinstance(node, ast.Dict):
         return dict, {type_and_value(node.keys[i])[1]: type_and_value(node.values[i])[1] for i in range(len(node.keys))}, comment
     elif isinstance(node, ast.UnaryOp):
