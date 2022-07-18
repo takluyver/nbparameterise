@@ -1,4 +1,5 @@
 import ast
+import sys
 
 import astcheck
 
@@ -81,9 +82,8 @@ def extract_comments(cell: str):
            comments[rowcol[0]] = tstr
     return comments
 
-def extract_definitions(cell):
+def find_assignments(cell):
     cell_ast = ast.parse(cell)
-    comments = extract_comments(cell)
 
     # We only want global assignments, so we're not walking the AST here.
     for stmt in cell_ast.body:
@@ -92,9 +92,13 @@ def extract_definitions(cell):
                 name = stmt.target.id
             else:  # ast.Assign
                 name = stmt.targets[0].id
-            typ, val, comment = type_and_value(stmt.value, comments)
-            yield Parameter(name, typ, val, comment=comment)
+            yield name, stmt
 
+def extract_definitions(cell):
+    comments = extract_comments(cell)
+    for name, stmt in find_assignments(cell):
+        typ, val, comment = type_and_value(stmt.value, comments)
+        yield Parameter(name, typ, val, comment=comment)
 
 def extract_remainder(cell: str):
     cell_ast = ast.parse(cell)
@@ -102,7 +106,51 @@ def extract_remainder(cell: str):
         if not astcheck.is_ast_like(stmt, definition_pattern):
             yield stmt
 
+def replace_assign_values(params: dict, cell):
+    """Rebuild code with modified parameters
+
+    This function for Python >= 3.8 (?) preserves the existing code structure
+    & comments, only replacing assignment values within the code.
+    """
+    # Stick None in to allow 1-based line indexing
+    old_lines = [None] + cell.splitlines(keepends=True)
+    from_line, from_col = 1, 0
+    vars_used = set()
+    output = []
+    for name, stmt in find_assignments(cell):
+        if name not in params:
+            continue  # Leave the existing value
+
+        vn = stmt.value
+        if vn.lineno == from_line: # Same line as last value we replaced
+            output.append(old_lines[from_line][from_col:vn.col_offset])
+        else:  # On a new line
+            output.append(old_lines[from_line][from_col:])
+            output.extend(old_lines[from_line+1 : vn.lineno])
+            output.append(old_lines[vn.lineno][:vn.col_offset])
+        from_line, from_col = vn.end_lineno, vn.end_col_offset
+
+        # Substitute in the new value for the variable
+        output.append(repr(params[name].value))
+
+    # Copy across any remaining code to the end of the cell
+    output.append(old_lines[from_line][from_col:])
+    output.extend(old_lines[from_line+1 :])
+
+    # Add in any variables for which we have a value but weren't in the code
+    unused_vars = set(params) - vars_used
+    if unused_vars:
+        output.append('\n')
+        for name in unused_vars:
+            output.append(f"{name} = {params[name].value!r}\n")
+
+    return ''.join(output)
+
 def build_definitions(inputs, comments=True, prev_code=None):
+    if prev_code and sys.version_info >= (3, 8):
+        params = {p.name: p for p in inputs}
+        return replace_assign_values(params, prev_code)
+
     new_code = []
     for param in inputs:
         s = f"{param.name} = {param.value!r}"
