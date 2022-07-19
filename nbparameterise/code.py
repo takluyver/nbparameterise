@@ -83,7 +83,7 @@ def extract_parameters(nb, lang=None):
 
     return params
 
-def parameter_values(params, **kwargs):
+def parameter_values(params, new_values=None, new='ignore', **kwargs):
     """Return a new parameter list/dict, substituting values from kwargs.
 
     Usage example::
@@ -94,21 +94,34 @@ def parameter_values(params, **kwargs):
         )
 
     Any parameters not supplied will keep their original value.
+    Names not already in params are ignored by default, but can be added with
+    ``new='add'`` or cause an error with ``new='error'``.
 
     This can be used with either a dict from :func:`extract_parameter_dict`
     or a list from :func:`extract_parameters`. It will return the corresponding
     container type.
     """
+    if new not in {'ignore', 'add', 'error'}:
+        raise ValueError("new= must be one of 'ignore'/'add'/'error'")
+    new_values = (new_values or {}).copy()
+    new_values.update(kwargs)
+
     if isinstance(params, dict):
-        new_list = parameter_values(params.values(), **kwargs)
+        new_list = parameter_values(params.values(), new_values, new=new)
         return {p.name: p for p in new_list}
 
-    res = []
-    for p in params:
-        if p.name in kwargs:
-            res.append(p.with_value(kwargs[p.name]))
-        else:
-            res.append(p)
+    res = [p.with_value(new_values[p.name]) if p.name in new_values else p
+           for p in params]
+
+    new_keys = set(new_values) - {p.name for p in params}
+    if new == 'error':
+        if new_keys:
+            raise KeyError(f"Unexpected keys: {sorted(new_keys)}")
+    elif new == 'add':
+        for k in new_keys:
+            value = new_values[k]
+            res.append(Parameter(k, type(value), value))
+
     return res
 
 def replace_definitions(nb, values, execute=False, execute_resources=None,

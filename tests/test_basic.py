@@ -98,7 +98,8 @@ class BasicTestCase(unittest.TestCase):
     def test_new_values_dict(self):
         new_dict = code.parameter_values(self.param_dict,
             a = "New text",
-            c = 12.0
+            c = 12.0,
+            z = 54,  # Extra parameters ignored by default
         )
 
         assert new_dict == {
@@ -111,6 +112,14 @@ class BasicTestCase(unittest.TestCase):
             'f': Parameter('f', dict, {0: 0, "item": True, "dict": {0: "text"}}),
         }
 
+    def test_add_param(self):
+        new_dict = code.parameter_values(self.param_dict, z=54, new='add')
+        assert set(new_dict) == {'a', 'b', 'b2', 'c', 'd', 'e', 'f', 'z'}
+        assert new_dict['z'] == Parameter('z', int, 54)
+
+    def test_err_new_param(self):
+        with self.assertRaises(KeyError):
+            new_dict = code.parameter_values(self.param_dict, z=54, new='error')
 
 def test_parameter_repr():
     p = Parameter('days', int, 7, metadata={'foo': 'boo'}, comment='# Days to show')
