@@ -1,12 +1,3 @@
-This is a tool to run notebooks with input values. When you write the notebook,
-these are defined in the first code cell, or a cell the a 'parameters' tag.
-with regular assignments like this:
-
-.. code-block:: python
-
-    stock = 'YHOO'
-    days_back = 600
-
 Nbparameterise handles finding and extracting these parameters, and replacing
 them with input values. You can then run the notebook with the new values.
 This can be used for:
