@@ -113,5 +113,5 @@ def replace_definitions(nb, values, execute=False, execute_resources=None,
     first_code_cell(nb).source = drv.build_definitions(values, comments=comments)
     if execute:
         resources = execute_resources or {}
-        nb, resources = ExecutePreprocessor().preprocess(nb, resources)
+        nb, resources = ExecutePreprocessor(timeout=600, kernel_name='python3').preprocess(nb, resources)
     return nb
