@@ -106,7 +106,7 @@ def extract_remainder(cell: str):
         if not astcheck.is_ast_like(stmt, definition_pattern):
             yield stmt
 
-def replace_assign_values(params: dict, cell):
+def build_definitions(params: dict, prev_code):
     """Rebuild code with modified parameters
 
     This function for Python >= 3.8 (?) preserves the existing code structure
@@ -115,11 +115,11 @@ def replace_assign_values(params: dict, cell):
     # [end_]col_offset count UTF-8 bytes, so we encode the code here and decode
     # again after slicing.
     # Stick None in to allow 1-based line indexing
-    old_lines = [None] + cell.encode().splitlines(keepends=True)
+    old_lines = [None] + prev_code.encode().splitlines(keepends=True)
     from_line, from_col = 1, 0
     vars_used = set()
     output = []
-    for name, stmt in find_assignments(cell):
+    for name, stmt in find_assignments(prev_code):
         if name not in params:
             continue  # Leave the existing value
 
@@ -150,26 +150,3 @@ def replace_assign_values(params: dict, cell):
 
     return ''.join(output)
 
-def build_definitions(inputs, comments=True, prev_code=None):
-    if prev_code and sys.version_info >= (3, 8):
-        params = {p.name: p for p in inputs}
-        return replace_assign_values(params, prev_code)
-
-    new_code = []
-    for param in inputs:
-        s = f"{param.name} = {param.value!r}"
-        if comments and param.comment:
-            comment = param.comment if param.comment.startswith('#') \
-                else '# ' + param.comment.lstrip()
-            s +=     f"  {comment}"
-        new_code.append(s)
-
-    if prev_code:
-        remainder = list(extract_remainder(prev_code))
-        if remainder:
-            new_code.extend([
-                '',
-                unparse(remainder),
-            ])
-
-    return "\n".join(new_code)

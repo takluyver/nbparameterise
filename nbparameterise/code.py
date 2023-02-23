@@ -1,6 +1,7 @@
 import copy
 import importlib
 import re
+from warnings import warn
 
 from nbconvert.preprocessors import ExecutePreprocessor
 
@@ -139,19 +140,19 @@ def replace_definitions(nb, values, execute=False, execute_resources=None,
 
     lang may be used to override the kernel name embedded in the notebook. For
     now, nbparameterise only handles 'python3' and 'python2'.
-
-    If comment is True, comments attached to the parameters will be included
-    in the replaced code, on the same line as the definition.
     """
-    if isinstance(values, dict):
-        values = list(values.values())
+    if isinstance(values, list):
+        values = {p.name: p for p in values}
+
+    if not comments:
+        warn("comments=False is now ignored", stacklevel=2)
 
     nb = copy.deepcopy(nb)
     params_cell = first_code_cell(nb)
 
     drv = get_driver_module(nb, override=lang)
     params_cell.source = drv.build_definitions(
-        values, comments=comments, prev_code=params_cell.source
+        values, prev_code=params_cell.source
     )
     if execute:
         resources = execute_resources or {}
