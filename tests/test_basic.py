@@ -62,8 +62,9 @@ class BasicTestCase(unittest.TestCase):
         assert ns['d'] == True
         assert ns['café'] == "καφές"
 
-        # Function should be preserved
+        # Function & non parameter assignment should be preserved
         assert ns['func']() == 0.25
+        assert ns['other_assignment'] == 21 ** 2
 
     def test_rebuild_from_dict(self):
         new_params = self.param_dict.copy()
@@ -84,8 +85,9 @@ class BasicTestCase(unittest.TestCase):
         assert ns['café'] == "καφές"
         assert ns['thé'] == "चाय"
 
-        # Function should be preserved
+        # Function & non parameter assignment should be preserved
         assert ns['func']() == 0.75
+        assert ns['other_assignment'] == 12 ** 2
 
     def test_new_values(self):
         params = code.parameter_values(self.params,
