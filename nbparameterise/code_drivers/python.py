@@ -112,8 +112,10 @@ def replace_assign_values(params: dict, cell):
     This function for Python >= 3.8 (?) preserves the existing code structure
     & comments, only replacing assignment values within the code.
     """
+    # [end_]col_offset count UTF-8 bytes, so we encode the code here and decode
+    # again after slicing.
     # Stick None in to allow 1-based line indexing
-    old_lines = [None] + cell.splitlines(keepends=True)
+    old_lines = [None] + cell.encode().splitlines(keepends=True)
     from_line, from_col = 1, 0
     vars_used = set()
     output = []
@@ -121,26 +123,28 @@ def replace_assign_values(params: dict, cell):
         if name not in params:
             continue  # Leave the existing value
 
+        vars_used.add(name)
+
         vn = stmt.value
         if vn.lineno == from_line: # Same line as last value we replaced
-            output.append(old_lines[from_line][from_col:vn.col_offset])
+            output.append(old_lines[from_line][from_col:vn.col_offset].decode())
         else:  # On a new line
-            output.append(old_lines[from_line][from_col:])
-            output.extend(old_lines[from_line+1 : vn.lineno])
-            output.append(old_lines[vn.lineno][:vn.col_offset])
+            output.append(old_lines[from_line][from_col:].decode())
+            output.extend([l.decode() for l in old_lines[from_line+1 : vn.lineno]])
+            output.append(old_lines[vn.lineno][:vn.col_offset].decode())
         from_line, from_col = vn.end_lineno, vn.end_col_offset
 
         # Substitute in the new value for the variable
         output.append(repr(params[name].value))
 
     # Copy across any remaining code to the end of the cell
-    output.append(old_lines[from_line][from_col:])
-    output.extend(old_lines[from_line+1 :])
+    output.append(old_lines[from_line][from_col:].decode())
+    output.extend([l.decode() for l in old_lines[from_line+1 :]])
 
     # Add in any variables for which we have a value but weren't in the code
     unused_vars = set(params) - vars_used
     if unused_vars:
-        output.append('\n')
+        output.append('\n\n')
         for name in unused_vars:
             output.append(f"{name} = {params[name].value!r}\n")
 
