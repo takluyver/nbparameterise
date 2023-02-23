@@ -100,11 +100,6 @@ def extract_definitions(cell):
         typ, val, comment = type_and_value(stmt.value, comments)
         yield Parameter(name, typ, val, comment=comment)
 
-def extract_remainder(cell: str):
-    cell_ast = ast.parse(cell)
-    for stmt in cell_ast.body:
-        if not astcheck.is_ast_like(stmt, definition_pattern):
-            yield stmt
 
 def build_definitions(params: dict, prev_code):
     """Rebuild code with modified parameters
