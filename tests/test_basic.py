@@ -23,6 +23,7 @@ class BasicTestCase(unittest.TestCase):
             Parameter('d', bool, False),
             Parameter('e', list, [0, 1.0, True, "text", [0, 1]]),
             Parameter('f', dict, {0: 0, "item": True, "dict": {0: "text"}}),
+            Parameter('café', str, "καφές"),
         ]
         assert self.params[4].comment == '# comment:bool'
         assert self.params[6].comment == '# comment:dict'
@@ -37,6 +38,7 @@ class BasicTestCase(unittest.TestCase):
             'd': Parameter('d', bool, False),
             'e': Parameter('e', list, [0, 1.0, True, "text", [0, 1]]),
             'f': Parameter('f', dict, {0: 0, "item": True, "dict": {0: "text"}}),
+            'café': Parameter('café', str, "καφές")
         }
 
     def test_rebuild(self):
@@ -58,6 +60,7 @@ class BasicTestCase(unittest.TestCase):
         assert ns['b2'] == -3
         assert ns['c'] == 0.25
         assert ns['d'] == True
+        assert ns['café'] == "καφές"
 
         # Function should be preserved
         assert ns['func']() == 0.25
@@ -66,6 +69,7 @@ class BasicTestCase(unittest.TestCase):
         new_params = self.param_dict.copy()
         new_params['c'] = self.param_dict['c'].with_value(0.75)
         new_params['e'] = self.param_dict['e'].with_value([5, 6, 7, 8])
+        new_params['thé'] = Parameter('thé', str, value="चाय")
 
         nb = code.replace_definitions(self.nb, new_params, execute=False)
 
@@ -77,6 +81,8 @@ class BasicTestCase(unittest.TestCase):
         assert ns['b'] == 12
         assert ns['c'] == 0.75
         assert ns['e'] == [5, 6, 7, 8]
+        assert ns['café'] == "καφές"
+        assert ns['thé'] == "चाय"
 
         # Function should be preserved
         assert ns['func']() == 0.75
@@ -87,7 +93,7 @@ class BasicTestCase(unittest.TestCase):
             c = 12.0
         )
 
-        assert [p.name for p in params] == ['a', 'b', 'b2', 'c', 'd', 'e', 'f']
+        assert [p.name for p in params] == ['a', 'b', 'b2', 'c', 'd', 'e', 'f', 'café']
 
         assert params[0].value == 'New text'
         assert params[1].value == 12
@@ -110,11 +116,12 @@ class BasicTestCase(unittest.TestCase):
             'd': Parameter('d', bool, False),
             'e': Parameter('e', list, [0, 1.0, True, "text", [0, 1]]),
             'f': Parameter('f', dict, {0: 0, "item": True, "dict": {0: "text"}}),
+            'café': Parameter('café', str, "καφές")
         }
 
     def test_add_param(self):
         new_dict = code.parameter_values(self.param_dict, z=54, new='add')
-        assert set(new_dict) == {'a', 'b', 'b2', 'c', 'd', 'e', 'f', 'z'}
+        assert set(new_dict) == {'a', 'b', 'b2', 'c', 'd', 'e', 'f', 'café', 'z'}
         assert new_dict['z'] == Parameter('z', int, 54)
 
     def test_err_new_param(self):
