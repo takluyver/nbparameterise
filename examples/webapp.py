@@ -35,9 +35,6 @@ class SubmissionHandler(tornado.web.RequestHandler):
         for v in self.application.parameters:
             if v.type is bool:
                 inp = v.with_value(self.get_argument(v.name, default='off') == 'on')
-            elif v.type is list:
-                #parse select element as string otherwise v.type will convert to a series of letters
-                inp = v.with_value(str(self.get_argument(v.name)))
             else:
                 inp = v.with_value(v.type(self.get_argument(v.name)))
             defined.append(inp)

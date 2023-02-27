@@ -43,12 +43,6 @@ py_type_to_html_input_type = {
 def make_input_element(var):
     if var.type is bool:
         input_elm = Checkbox(var.name, var.value)
-
-    elif var.type is list:
-        input_elm = htmlgen.Select(name=var.name)
-        for item in var.value:
-            input_elm.create_option(item,item)
-
     else:
         input_elm = Input(py_type_to_html_input_type[var.type], var.name,
                           str(var.value))
