@@ -1,6 +1,7 @@
 import copy
 import importlib
 import re
+from warnings import warn
 
 from nbconvert.preprocessors import ExecutePreprocessor
 
@@ -51,6 +52,19 @@ def get_driver_module(nb, override=None):
     assert kernel_name_re.match(module_name)
     return importlib.import_module('nbparameterise.code_drivers.%s' % module_name)
 
+def extract_parameter_dict(nb, lang=None):
+    """Returns a dictionary of Parameter objects derived from the notebook.
+
+    This looks for assignments (like 'n = 50') in the first code cell of the
+    notebook. The parameters may also have some metadata stored in the notebook
+    metadata; this will be attached as the .metadata instance on each one.
+
+    lang may be used to override the kernel name embedded in the notebook. For
+    now, nbparameterise only handles 'python'.
+    """
+    params = extract_parameters(nb, lang)
+    return {p.name: p for p in params}
+
 def extract_parameters(nb, lang=None):
     """Returns a list of Parameter instances derived from the notebook.
 
@@ -59,7 +73,7 @@ def extract_parameters(nb, lang=None):
     metadata; this will be attached as the .metadata instance on each one.
 
     lang may be used to override the kernel name embedded in the notebook. For
-    now, nbparameterise only handles 'python3' and 'python2'.
+    now, nbparameterise only handles 'python'.
     """
     drv = get_driver_module(nb, override=lang)
     params = list(drv.extract_definitions(first_code_cell(nb).source))
@@ -70,8 +84,8 @@ def extract_parameters(nb, lang=None):
 
     return params
 
-def parameter_values(params, **kwargs):
-    """Return a copy of the parameter list, substituting values from kwargs.
+def parameter_values(params, new_values=None, new='ignore', **kwargs):
+    """Return a new parameter list/dict, substituting values from kwargs.
 
     Usage example::
 
@@ -81,20 +95,42 @@ def parameter_values(params, **kwargs):
         )
 
     Any parameters not supplied will keep their original value.
+    Names not already in params are ignored by default, but can be added with
+    ``new='add'`` or cause an error with ``new='error'``.
+
+    This can be used with either a dict from :func:`extract_parameter_dict`
+    or a list from :func:`extract_parameters`. It will return the corresponding
+    container type.
     """
-    res = []
-    for p in params:
-        if p.name in kwargs:
-            res.append(p.with_value(kwargs[p.name]))
-        else:
-            res.append(p)
+    if new not in {'ignore', 'add', 'error'}:
+        raise ValueError("new= must be one of 'ignore'/'add'/'error'")
+    new_values = (new_values or {}).copy()
+    new_values.update(kwargs)
+
+    if isinstance(params, dict):
+        new_list = parameter_values(params.values(), new_values, new=new)
+        return {p.name: p for p in new_list}
+
+    res = [p.with_value(new_values[p.name]) if p.name in new_values else p
+           for p in params]
+
+    new_keys = set(new_values) - {p.name for p in params}
+    if new == 'error':
+        if new_keys:
+            raise KeyError(f"Unexpected keys: {sorted(new_keys)}")
+    elif new == 'add':
+        for k in new_keys:
+            value = new_values[k]
+            res.append(Parameter(k, type(value), value))
+
     return res
 
 def replace_definitions(nb, values, execute=False, execute_resources=None,
                         lang=None, *, comments=True):
     """Return a copy of nb with the first code cell defining the given parameters.
 
-    values should be a list of Parameter objects (as returned by extract_parameters),
+    values should be a dict (from :func:`extract_parameter_dict`) or a list
+    (from :func:`extract_parameters`) of :class:`Parameter` objects,
     with their .value attribute set to the desired value.
 
     If execute is True, the notebook is executed with the new values.
@@ -104,13 +140,20 @@ def replace_definitions(nb, values, execute=False, execute_resources=None,
 
     lang may be used to override the kernel name embedded in the notebook. For
     now, nbparameterise only handles 'python3' and 'python2'.
-
-    If comment is True, comments attached to the parameters will be included
-    in the replaced code, on the same line as the definition.
     """
+    if isinstance(values, list):
+        values = {p.name: p for p in values}
+
+    if not comments:
+        warn("comments=False is now ignored", stacklevel=2)
+
     nb = copy.deepcopy(nb)
+    params_cell = first_code_cell(nb)
+
     drv = get_driver_module(nb, override=lang)
-    first_code_cell(nb).source = drv.build_definitions(values, comments=comments)
+    params_cell.source = drv.build_definitions(
+        values, prev_code=params_cell.source
+    )
     if execute:
         resources = execute_resources or {}
         nb, resources = ExecutePreprocessor().preprocess(nb, resources)
