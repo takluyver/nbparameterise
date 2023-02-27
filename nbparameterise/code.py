@@ -71,11 +71,15 @@ def extract_parameter_dict(nb, lang=None, tag='Parameters'):
     """Returns a dictionary of Parameter objects derived from the notebook.
 
     This looks for assignments (like 'n = 50') in the first code cell of the
-    notebook. The parameters may also have some metadata stored in the notebook
-    metadata; this will be attached as the .metadata instance on each one.
+    notebook, or the first cell with a 'parameters' tag. The parameters may also
+    have some metadata stored in the notebook metadata; this will be attached as
+    the .metadata instance on each one.
 
-    lang may be used to override the kernel name embedded in the notebook. For
+    *lang* may be used to override the kernel name embedded in the notebook. For
     now, nbparameterise only handles 'python'.
+
+    *tag* specifies the cell tag which it will look for, with case-insensitive
+    matching. If no code cell has the tag, it will take the first code cell.
     """
     params = extract_parameters(nb, lang, tag=tag)
     return {p.name: p for p in params}
@@ -84,11 +88,15 @@ def extract_parameters(nb, lang=None, tag='Parameters'):
     """Returns a list of Parameter instances derived from the notebook.
 
     This looks for assignments (like 'n = 50') in the first code cell of the
-    notebook. The parameters may also have some metadata stored in the notebook
-    metadata; this will be attached as the .metadata instance on each one.
+    notebook, or the first cell with a 'parameters' tag. The parameters may also
+    have some metadata stored in the notebook metadata; this will be attached as
+    the .metadata instance on each one.
 
-    lang may be used to override the kernel name embedded in the notebook. For
+    *lang* may be used to override the kernel name embedded in the notebook. For
     now, nbparameterise only handles 'python'.
+
+    *tag* specifies the cell tag which it will look for, with case-insensitive
+    matching. If no code cell has the tag, it will take the first code cell.
     """
     drv = get_driver_module(nb, override=lang)
     cell = get_parameter_cell(nb,tag)
@@ -144,7 +152,7 @@ def parameter_values(params, new_values=None, new='ignore', **kwargs):
 
 def replace_definitions(nb, values, execute=False, execute_resources=None,
                         lang=None, *, comments=True, tag='Parameters'):
-    """Return a copy of nb with the first code cell defining the given parameters.
+    """Return a copy of nb with the parameter cell defining the given parameters.
 
     values should be a dict (from :func:`extract_parameter_dict`) or a list
     (from :func:`extract_parameters`) of :class:`Parameter` objects,
@@ -155,8 +163,12 @@ def replace_definitions(nb, values, execute=False, execute_resources=None,
     and if possible should contain a 'path' key for the working directory in
     which to run the notebook.
 
-    lang may be used to override the kernel name embedded in the notebook. For
+    *lang* may be used to override the kernel name embedded in the notebook. For
     now, nbparameterise only handles 'python3' and 'python2'.
+
+    *tag* specifies the cell tag which the parameter cell should have, with
+    case-insensitive matching. If no code cell has the tag, it will replace the
+    first code cell.
     """
     if isinstance(values, list):
         values = {p.name: p for p in values}
