@@ -182,6 +182,7 @@ def replace_definitions(nb, values, execute=False, execute_resources=None,
     cell = get_parameter_cell(nb, tag)
     cell.source = drv.build_definitions(values, prev_code=cell.source)
     if execute:
+        warn("execute=True is deprecated, use nbclient instead", stacklevel=2)
         resources = execute_resources or {}
         nb, resources = ExecutePreprocessor().preprocess(nb, resources)
     return nb
