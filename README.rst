@@ -1,5 +1,6 @@
 This is a tool to run notebooks with input values. When you write the notebook,
-these are defined in the first code cell, with regular assignments like this:
+these are defined in the first code cell - or a cell with a 'parameters' cell
+tag - with regular assignments like this:
 
 .. code-block:: python
 
