@@ -3,5 +3,5 @@
 __version__ = '0.5'
 
 from .code import (
-    Parameter, extract_parameters, replace_definitions, parameter_values,
+    Parameter, extract_parameters, replace_definitions, parameter_values, get_parameter_cell,
 )
