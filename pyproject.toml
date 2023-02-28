@@ -15,7 +15,6 @@ readme = "README.rst"
 dependencies = [
     "nbconvert",
     "astcheck >=0.3",
-    "astunparse; python_version < '3.9'",
 ]
 requires-python = ">=3.8"
 dynamic = ['version', 'description']

@@ -1,15 +1,8 @@
 import ast
-import sys
+import tokenize
+from io import StringIO
 
 import astcheck
-
-try:
-    from ast import unparse
-except ImportError:
-    from astunparse import unparse
-
-from io import StringIO
-import tokenize
 
 from ..code import Parameter
 
