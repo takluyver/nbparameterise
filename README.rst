@@ -54,3 +54,23 @@ Usage:
     nbclient.execute(new_nb)
 
 If you are interested in using your parameterized Jupyter notebooks through a command line interface, have a look at `nbclick <https://github.com/ssciwr/nbclick>`_.
+
+Changes
+-------
+
+0.6
+~~~
+
+2023-02-28
+
+- The parameters cell no longer needs to be the first code cell: if you add a cell tag
+  'parameters' to another cell, parameters will be extracted from and replaced in that
+  cell. Capitalisation doesn't matter. (`PR #27
+  <https://github.com/takluyver/nbparameterise/pull/27>`_).
+- Only the parameter values are replaced: other code in the parameter cell  will now be
+  preserved unchanged (`PR #19 <https://github.com/takluyver/nbparameterise/pull/19>`_).
+  The ``comment=`` parameter now has no effect, and it may be removed in a future
+  version.
+- The ``execute=`` parameter for ``replace_definitions()`` is now deprecated.
+  Please use `nbclient <https://nbclient.readthedocs.io/en/latest/>`_ to execute
+  your notebook after substituting parameters.
