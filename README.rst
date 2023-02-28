@@ -74,3 +74,4 @@ Changes
 - The ``execute=`` parameter for ``replace_definitions()`` is now deprecated.
   Please use `nbclient <https://nbclient.readthedocs.io/en/latest/>`_ to execute
   your notebook after substituting parameters.
+- nbparameterise now requires Python 3.8 or above.
