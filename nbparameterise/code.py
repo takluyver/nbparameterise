@@ -3,7 +3,6 @@ import importlib
 import re
 from warnings import warn
 
-from nbconvert.preprocessors import ExecutePreprocessor
 
 class Parameter(object):
     def __init__(self, name, vtype, value=None, metadata=None, comment=None):
@@ -183,6 +182,7 @@ def replace_definitions(nb, values, execute=False, execute_resources=None,
     cell.source = drv.build_definitions(values, prev_code=cell.source)
     if execute:
         warn("execute=True is deprecated, use nbclient instead", stacklevel=2)
+        from nbconvert.preprocessors import ExecutePreprocessor
         resources = execute_resources or {}
         nb, resources = ExecutePreprocessor().preprocess(nb, resources)
     return nb
