@@ -58,6 +58,14 @@ If you are interested in using your parameterized Jupyter notebooks through a co
 Changes
 -------
 
+0.6.1
+~~~~~
+
+2024-05-15
+
+- nbparameterise no longer requires `nbconvert <https://pypi.org/project/nbconvert/>`_,
+  and loads it only if you pass the deprecated ``execute=True`` option.
+
 0.6
 ~~~
 
