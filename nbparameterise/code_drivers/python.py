@@ -13,9 +13,7 @@ def check_simple_value(node):
     """Numbers, booleans, strings"""
     if isinstance(node, ast.Constant):
         v = node.value
-        if isinstance(v, (int, float, str)):
-            return True
-        elif v in (True, False):
+        if isinstance(v, (bool, int, float, str)):
             return True
     elif (isinstance(node, ast.UnaryOp)
         and isinstance(node.operand, ast.Constant)
@@ -71,7 +69,8 @@ def type_and_value(node, comments={}):
             elif isinstance(op, ast.Invert):
                return ~v
         return type(node.operand.value), apply_op(node.operand.value, node.op), comment
-    return bool, node.value, comment
+
+    raise ValueError(f"Unexpected AST node {node}")
 
 def extract_comments(cell: str):
     comments = {}
