@@ -149,8 +149,7 @@ def parameter_values(params, new_values=None, new='ignore', **kwargs):
 
     return res
 
-def replace_definitions(nb, values, execute=False, execute_resources=None,
-                        lang=None, *, comments=True, tag='Parameters'):
+def replace_definitions(nb, values, *, lang=None, tag='Parameters'):
     """Return a copy of nb with the parameter cell defining the given parameters.
 
     values should be a dict (from :func:`extract_parameter_dict`) or a list
@@ -172,17 +171,9 @@ def replace_definitions(nb, values, execute=False, execute_resources=None,
     if isinstance(values, list):
         values = {p.name: p for p in values}
 
-    if not comments:
-        warn("comments=False is now ignored", stacklevel=2)
-
     nb = copy.deepcopy(nb)
 
     drv = get_driver_module(nb, override=lang)
     cell = get_parameter_cell(nb, tag)
     cell.source = drv.build_definitions(values, prev_code=cell.source)
-    if execute:
-        warn("execute=True is deprecated, use nbclient instead", stacklevel=2)
-        from nbconvert.preprocessors import ExecutePreprocessor
-        resources = execute_resources or {}
-        nb, resources = ExecutePreprocessor().preprocess(nb, resources)
     return nb

@@ -39,7 +39,7 @@ def test_rebuild(tagged_cell_nb):
         params[3].with_value(0.25),
         params[4].with_value(True),
     ]
-    nb = replace_definitions(tagged_cell_nb, from_form, execute=False)
+    nb = replace_definitions(tagged_cell_nb, from_form)
     cell = get_parameter_cell(nb, 'ParametErs')  # Not case-sensitive
     assert "# comment:bool" in cell.source
 
@@ -50,4 +50,3 @@ def test_rebuild(tagged_cell_nb):
     assert ns['b2'] == -3
     assert ns['c'] == 0.25
     assert ns['d'] == True
-
