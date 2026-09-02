@@ -58,6 +58,19 @@ If you are interested in using your parameterized Jupyter notebooks through a co
 Changes
 -------
 
+1.0
+~~~
+
+2026-09-02
+
+- Compatibility with recent Python versions, up to & including Python 3.14.
+- The deprecated ``execute`` and ``execute_resources`` parameters in
+  ``replace_definitions()`` were removed.
+  `Use nbclient <https://nbclient.readthedocs.io/en/latest/client.html>`_ if
+  you want to execute the notebook with modified parameters.
+- The deprecated ``comments`` parameter for ``replace_definitions()`` was removed.
+  Comments in the parameter cell are now always preserved.
+
 0.6.1
 ~~~~~
 

@@ -49,7 +49,7 @@ class BasicTestCase(unittest.TestCase):
             self.params[3].with_value(0.25),
             self.params[4].with_value(True),
         ]
-        nb = code.replace_definitions(self.nb, from_form, execute=False)
+        nb = code.replace_definitions(self.nb, from_form)
         cell = get_parameter_cell(nb)
         assert "# comment:bool" in cell.source
 
@@ -72,7 +72,7 @@ class BasicTestCase(unittest.TestCase):
         new_params['e'] = self.param_dict['e'].with_value([5, 6, 7, 8])
         new_params['thé'] = Parameter('thé', str, value="चाय")
 
-        nb = code.replace_definitions(self.nb, new_params, execute=False)
+        nb = code.replace_definitions(self.nb, new_params)
 
         assert "# comment:bool" in nb.cells[0].source
 
