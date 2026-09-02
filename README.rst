@@ -58,6 +58,13 @@ If you are interested in using your parameterized Jupyter notebooks through a co
 Changes
 -------
 
+1.0
+~~~
+
+2026-09-02
+
+- Compatibility with recent Python versions, up to & including Python 3.14.
+
 0.6.1
 ~~~~~
 
