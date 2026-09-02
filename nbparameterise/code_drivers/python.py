@@ -48,7 +48,7 @@ def check_fillable_node(node, path):
     raise astcheck.ASTMismatch(path, node, 'number, string, boolean, list or dict')
 
 definition_pattern = astcheck.single_assign(
-    target=ast.Name(ctx=ast.Store()), value=check_fillable_node
+    target=ast.Name(id=None, ctx=ast.Store()), value=check_fillable_node
 )
 
 def type_and_value(node, comments={}):
